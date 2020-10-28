@@ -50,6 +50,9 @@ LIBS += kernel32.lib\
         D:/program_cpp/livox_sdk/Livox-SDK/temp64/sdk_core/Debug/livox_sdk_static.lib\
         D:/program_cpp/livox_sdk/Livox-SDK/third_party/apr/lib/libapr-1.lib\
         OpenGL32.Lib\
-        GlU32.Lib
+        GlU32.Lib\
+        glut32.lib\
+        C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib
+
 
 
