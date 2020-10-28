@@ -23,8 +23,8 @@ public:
     static QVector<QVector3D> vertices_positions;
     static QVector<QVector3D> vertices_colors;
     static QVector<uint8_t> vertices_reflectivity;
-    static QVector<QVector3D> vertices_buffer;
     static QVector<uint8_t> reflectivity_buffer;
+    static QVector<QVector3D> vertices_buffer;
 
 
     float TempscaleFactor;

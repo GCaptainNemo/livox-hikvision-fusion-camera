@@ -13,6 +13,7 @@ QVector<uint8_t> centralwindow::reflectivity_buffer = {};
 //QVector<QVector3D> centralwindow::vertices_colors = {{1, 1, 1} * 1000}
 centralwindow::centralwindow(QWidget *parent) : QOpenGLWidget(parent)
 {
+
     this->eyex = 0.1;
     this->eyey = 0.1;
     this->eyez = 0.1;

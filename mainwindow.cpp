@@ -5,7 +5,7 @@
 
 
 
-
+//
 int MainWindow::lidar_count = 1;
 uint32_t MainWindow::data_receive_count = 0;
 int MainWindow::bufferVertexCount = 0;

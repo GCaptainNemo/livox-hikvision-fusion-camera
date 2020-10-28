@@ -7,8 +7,8 @@
 class frontEndInfo
 {
 public:
+    //
     frontEndInfo();
-
 //    static QString frontEndIpPort;
 //    static QString broadcastCode;
 //    typedef enum {

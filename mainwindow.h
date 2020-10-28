@@ -46,8 +46,8 @@ public:
     // 用静态函数避免实例化调用
     // /////////////////////////////////////////////////////////////////////////////////////
 
-    static void OnDeviceBroadcast(const BroadcastDeviceInfo *info);
     static void GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t data_num, void *client_data);
+    static void OnDeviceBroadcast(const BroadcastDeviceInfo *info);
 
     /* Callback function of changing of device state. */
 
