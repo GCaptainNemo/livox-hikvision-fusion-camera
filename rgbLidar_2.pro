@@ -19,15 +19,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     centralwindow.cpp \
     frontendinfo.cpp \
-    hikvisionreceiver.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    receiverhikvision.cpp \
+    receiverlivox.cpp
 
 HEADERS += \
     centralwindow.h \
     frontendinfo.h \
-    hikvisionreceiver.h \
-    mainwindow.h
+    mainwindow.h \
+    receiverhikvision.h \
+    receiverlivox.h
 
 
 INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
@@ -37,6 +39,7 @@ INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/F
                D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include\
                C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
                D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
+               C:/Program Files/MATLAB/R2018a/toolbox/vision/builtins/src/ocvcg/opencv/include/opencv2
 
 
 

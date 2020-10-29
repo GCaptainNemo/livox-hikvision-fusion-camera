@@ -5,13 +5,13 @@
 #include <gl/GLU.h>
 #include <GL/glut.h>
 
-QVector<QVector3D> centralwindow::vertices_positions = {};
-QVector<uint8_t> centralwindow::vertices_reflectivity = {};
-QVector<QVector3D> centralwindow::vertices_buffer = {};
-QVector<uint8_t> centralwindow::reflectivity_buffer = {};
+QVector<QVector3D> renderWindow::vertices_positions = {};
+QVector<uint8_t> renderWindow::vertices_reflectivity = {};
+QVector<QVector3D> renderWindow::vertices_buffer = {};
+QVector<uint8_t> renderWindow::reflectivity_buffer = {};
 
 //QVector<QVector3D> centralwindow::vertices_colors = {{1, 1, 1} * 1000}
-centralwindow::centralwindow(QWidget *parent) : QOpenGLWidget(parent)
+renderWindow::renderWindow(QWidget *parent) : QOpenGLWidget(parent)
 {
 
     this->eyex = 0.1;
@@ -31,7 +31,7 @@ centralwindow::centralwindow(QWidget *parent) : QOpenGLWidget(parent)
 
 }
 
-void centralwindow::updateWindowSLOT()
+void renderWindow::updateWindowSLOT()
 {
     this->update();
 }
@@ -39,7 +39,7 @@ void centralwindow::updateWindowSLOT()
 
 
 
-void centralwindow::initializeGL()
+void renderWindow::initializeGL()
 {
     // 为当前环境初始化OpenGL函数,此时QOpenglFunctions对象只可以使用这个上下文。
     initializeOpenGLFunctions();
@@ -83,13 +83,13 @@ void centralwindow::initializeGL()
 
 };
 
-void centralwindow::resizeGL(int w,int h)
+void renderWindow::resizeGL(int w,int h)
 {
 
 };
 
 
-void centralwindow::paintGL()
+void renderWindow::paintGL()
 {
     // qDebug() << "REPAINT AGAIN!!!!!";
 
@@ -147,34 +147,34 @@ void centralwindow::paintGL()
 }
 
 
-void centralwindow::drawShape()
+void renderWindow::drawShape()
 {
-    qDebug() << "length = " << centralwindow::vertices_buffer.length();
+    qDebug() << "length = " << renderWindow::vertices_buffer.length();
     glPointSize(3);
-    for(int i=0; i<centralwindow::vertices_buffer.length(); i++)
+    for(int i=0; i<renderWindow::vertices_buffer.length(); i++)
     {
         glBegin(GL_QUADS);
-        glColor4f(centralwindow::reflectivity_buffer[i], 0, 0, 0);
-            glVertex3f(centralwindow::vertices_buffer[i].x() / 1000 + 0.5f,
-                    centralwindow::vertices_buffer[i].y() / 1000 + 0.5f,
-                    centralwindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(centralwindow::vertices_buffer[i].x() / 1000 - 0.5f,
-                    centralwindow::vertices_buffer[i].y() / 1000+ 0.5f,
-                    centralwindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(centralwindow::vertices_buffer[i].x() / 1000 + 0.5f,
-                    centralwindow::vertices_buffer[i].y() / 1000- 0.5f,
-                    centralwindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(centralwindow::vertices_buffer[i].x()/ 1000 - 0.5f,
-                    centralwindow::vertices_buffer[i].y()/ 1000 - 0.5f,
-                    centralwindow::vertices_buffer[i].z()/ 1000);
+        glColor4f(renderWindow::reflectivity_buffer[i], 0, 0, 0);
+            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
+                    renderWindow::vertices_buffer[i].y() / 1000 + 0.5f,
+                    renderWindow::vertices_buffer[i].z() / 1000);
+            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 - 0.5f,
+                    renderWindow::vertices_buffer[i].y() / 1000+ 0.5f,
+                    renderWindow::vertices_buffer[i].z() / 1000);
+            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
+                    renderWindow::vertices_buffer[i].y() / 1000- 0.5f,
+                    renderWindow::vertices_buffer[i].z() / 1000);
+            glVertex3f(renderWindow::vertices_buffer[i].x()/ 1000 - 0.5f,
+                    renderWindow::vertices_buffer[i].y()/ 1000 - 0.5f,
+                    renderWindow::vertices_buffer[i].z()/ 1000);
         glEnd();
     }
-    centralwindow::vertices_buffer.clear();
-    centralwindow::reflectivity_buffer.clear();
+    renderWindow::vertices_buffer.clear();
+    renderWindow::reflectivity_buffer.clear();
 }
 
 
-void centralwindow::mouseMoveEvent(QMouseEvent *event)
+void renderWindow::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint ed(event->pos());
     EndPoint = ed;
@@ -183,7 +183,7 @@ void centralwindow::mouseMoveEvent(QMouseEvent *event)
 }
 //    void mouseClickEvent(QMouseEvent *event);
 
-void centralwindow::RotateViewPoint()
+void renderWindow::RotateViewPoint()
 {
     float avAnale = M_PI / 180 * 0.6; //把每次移动的角度单位化
 
@@ -215,7 +215,7 @@ void centralwindow::RotateViewPoint()
     upz = vector2.z();
 }
 
-void centralwindow::drawCoordinate()
+void renderWindow::drawCoordinate()
 {
     /*红色轴是X轴，绿色是Y轴，蓝色是Z轴*/
     glBegin(GL_LINES);
@@ -256,13 +256,13 @@ void centralwindow::drawCoordinate()
 }
 
 
-void centralwindow::mousePressEvent(QMouseEvent *event)
+void renderWindow::mousePressEvent(QMouseEvent *event)
 {
     QPoint st(event->pos());
     StartPoint = st;
 }
 
-void centralwindow::mouseReleaseEvent(QMouseEvent *event)
+void renderWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     /*记录上一次的角度*/
     LastAngleZ = CurrentAngleZ;
@@ -274,7 +274,7 @@ void centralwindow::mouseReleaseEvent(QMouseEvent *event)
 
 
 
-void centralwindow::wheelEvent(QWheelEvent *event)
+void renderWindow::wheelEvent(QWheelEvent *event)
 {
 
     qDebug() << "event->delta() = " << event->delta();
@@ -286,7 +286,7 @@ void centralwindow::wheelEvent(QWheelEvent *event)
     }
 }
 
-void centralwindow::scaleVariable(float delta)
+void renderWindow::scaleVariable(float delta)
 {
     if(TempscaleFactor >= 0.1)
     {

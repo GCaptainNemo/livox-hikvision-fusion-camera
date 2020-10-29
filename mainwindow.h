@@ -9,6 +9,12 @@
 #include <QThread>
 #include <QMutex>
 #include "centralwindow.h"
+#include <QHBoxLayout>
+#include <QWidget>
+#include <QLabel>
+#include <QSplitter>
+#include "receiverhikvision.h"
+
 
 typedef enum {
   kDeviceStateDisconnect = 0,
@@ -39,13 +45,17 @@ class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
+protected:
+
 
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+
+
     // /////////////////////////////////////////////////////////////////////////////////////
-    // 用静态函数避免实例化调用
+    // 用静态函数避免实例化调用 livox receiver
     // /////////////////////////////////////////////////////////////////////////////////////
 
     static void GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t data_num, void *client_data);
@@ -63,9 +73,6 @@ public:
     static void LidarDisConnect(const DeviceInfo *info);
     static void LidarStateChange(const DeviceInfo *info);
 
-
-
-
 public:
     static QMutex vector_qmutex;
 
@@ -82,10 +89,12 @@ signals:
 
 
 protected:
-    centralwindow * centralWindowWidget;
-    static bool lockOrNot;
+    QWidget * centralWidget;
+    QHBoxLayout * centralHLayout;
+    QLabel * label;
 
-
+    renderWindow * renderRgbPCWidget;
+    hikvisionReceiver * hikvisionReceive;
 };
 
 

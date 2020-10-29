@@ -12,14 +12,14 @@
 #include <QTimer>
 #include <QGLWidget>
 #include <QMouseEvent>
-
+#include <QLabel>
 #define M_PI 3.1415
 
-class centralwindow : public QOpenGLWidget, protected QOpenGLFunctions
+class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
-    explicit centralwindow(QWidget *parent = nullptr);
+    explicit renderWindow(QWidget *parent = nullptr);
     static QVector<QVector3D> vertices_positions;
     static QVector<QVector3D> vertices_colors;
     static QVector<uint8_t> vertices_reflectivity;
@@ -64,6 +64,8 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+
+
 
 
 signals:

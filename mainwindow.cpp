@@ -11,8 +11,6 @@ int MainWindow::bufferVertexCount = 0;
 
 MainWindow* MainWindow::replaceThisPointer = nullptr;
 QMutex MainWindow::vector_qmutex;
-bool MainWindow::lockOrNot = true;
-
 
 char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
@@ -62,9 +60,28 @@ void setLidarThreadObject::setLidarSLOT()
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+
+
     MainWindow::replaceThisPointer = this;
-    centralWindowWidget = new centralwindow();
-    this->setCentralWidget(centralWindowWidget);
+    centralWidget = new QWidget(this);
+    centralHLayout = new QHBoxLayout();
+
+    label = new QLabel(centralWidget);
+
+
+    renderRgbPCWidget = new renderWindow(centralWidget);
+    centralHLayout->addWidget(this->renderRgbPCWidget);
+    centralHLayout->addWidget(this->label);
+    centralWidget->setLayout(centralHLayout);
+    this->setCentralWidget(centralWidget);
+
+    hikvisionReceive = new hikvisionReceiver();
+
+
+    HWND hwnd = (HWND)this->label->winId();
+    NET_DVR_PREVIEWINFO struPlayInfo;
+    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);
+
 
     qDebug() << "Current Thread ID: " << QThread::currentThreadId();
     setLidarThreadObject * setLidarThreadObj = new setLidarThreadObject();
@@ -197,22 +214,22 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
 
 
 //            MainWindow::vector_qmutex.lock();
-            centralwindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
+            renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
 //            MainWindow::vector_qmutex.unlock();
 
-            centralwindow::vertices_reflectivity << p_point_data->reflectivity;
+            renderWindow::vertices_reflectivity << p_point_data->reflectivity;
             }
             else
             {
 //                MainWindow::vector_qmutex.lock();
 
-                centralwindow::vertices_buffer.swap(centralwindow::vertices_positions);
-                centralwindow::reflectivity_buffer.swap(centralwindow::vertices_reflectivity);
+                renderWindow::vertices_buffer.swap(renderWindow::vertices_positions);
+                renderWindow::reflectivity_buffer.swap(renderWindow::vertices_reflectivity);
 
-                replaceThisPointer->centralWindowWidget->update();
+                replaceThisPointer->renderRgbPCWidget->update();
 
 //                MainWindow::vector_qmutex.lock();
-                qDebug() << "vertices_positions's length = " << centralwindow::vertices_positions.length();
+                qDebug() << "vertices_positions's length = " << renderWindow::vertices_positions.length();
 //                MainWindow::vector_qmutex.unlock();
                 MainWindow::bufferVertexCount = 0;
             }

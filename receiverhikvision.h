@@ -3,17 +3,18 @@
 #include <Windows.h>
 #include <HCNetSDK.h>
 #include <QDebug>
+// #include "opencv.hpp"
+
 
 class hikvisionReceiver:public QObject
 {
     Q_OBJECT
 public:
     hikvisionReceiver();
-    long play(long userID, HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo);
+    long play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo);
     virtual ~hikvisionReceiver();
-
-
-
+    long userID;
+    void CALLBACK fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser);
 
 };
 
