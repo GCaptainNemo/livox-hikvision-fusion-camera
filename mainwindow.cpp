@@ -5,7 +5,6 @@
 
 
 
-//
 int MainWindow::lidar_count = 1;
 uint32_t MainWindow::data_receive_count = 0;
 int MainWindow::bufferVertexCount = 0;
@@ -23,7 +22,7 @@ char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
 DeviceItem devices[kMaxLidarCount] = {};
 
 
-void setLidarThread::setLidarSLOT()
+void setLidarThreadObject::setLidarSLOT()
 {
     qDebug() << "Current Thread ID2: " << QThread::currentThreadId();
 
@@ -68,10 +67,13 @@ MainWindow::MainWindow(QWidget *parent)
     this->setCentralWidget(centralWindowWidget);
 
     qDebug() << "Current Thread ID: " << QThread::currentThreadId();
-    setLidarThread * setLidarThreadObject = new setLidarThread();
+    setLidarThreadObject * setLidarThreadObj = new setLidarThreadObject();
     QThread * thread = new QThread();
-    setLidarThreadObject->moveToThread(thread);
-    connect(this, SIGNAL(setLidarSIGNAL()), setLidarThreadObject, SLOT(setLidarSLOT()));
+    setLidarThreadObj->moveToThread(thread);
+    connect(this, SIGNAL(setLidarSIGNAL()), setLidarThreadObj, SLOT(setLidarSLOT()));
+    connect(thread, SIGNAL(finished()), setLidarThreadObj, SLOT(deleteLater()) );
+    connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()) );
+
     thread->start();
     emit setLidarSIGNAL();
 }
@@ -325,9 +327,6 @@ void MainWindow::LidarStateChange(const DeviceInfo *info) {
 
 MainWindow::~MainWindow()
 {
-
-
-
 
 }
 

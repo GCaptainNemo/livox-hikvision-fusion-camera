@@ -24,13 +24,15 @@ typedef struct {
 
 
 
-class setLidarThread: public QObject
+class setLidarThreadObject: public QObject
 {
     Q_OBJECT
 public slots:
     void setLidarSLOT();
 
 };
+
+
 
 
 class MainWindow : public QMainWindow
@@ -70,7 +72,7 @@ public:
     static int lidar_count;
     static uint32_t data_receive_count; //  uint32_t goes from 0 to 2^32 - 1.
     static char broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize];  //  32 × 16
-    setLidarThread * setlidar_thread;
+    setLidarThreadObject * setlidar_thread;
     static MainWindow * replaceThisPointer;
     static int bufferVertexCount;
 

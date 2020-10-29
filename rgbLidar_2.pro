@@ -19,12 +19,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     centralwindow.cpp \
     frontendinfo.cpp \
+    hikvisionreceiver.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     centralwindow.h \
     frontendinfo.h \
+    hikvisionreceiver.h \
     mainwindow.h
 
 
@@ -33,7 +35,9 @@ INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/F
                C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt\
                D:/program_cpp/livox_sdk/Livox-SDK/third_party/apr/include\
                D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include\
-               C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64
+               C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
+               D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
+
 
 
 
@@ -52,7 +56,14 @@ LIBS += kernel32.lib\
         OpenGL32.Lib\
         GlU32.Lib\
         glut32.lib\
-        C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib
+        C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCAlarm.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCGeneralCfgMgr.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCPreview.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib
+
 
 
 
