@@ -39,7 +39,8 @@ INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/F
                D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include\
                C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
                D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
-               C:/Program Files/MATLAB/R2018a/toolbox/vision/builtins/src/ocvcg/opencv/include/opencv2
+               C:/opencv/opencv/build/include\
+               C:/opencv/opencv\build\include\opencv2\
 
 
 
@@ -65,7 +66,10 @@ LIBS += kernel32.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCAlarm.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCGeneralCfgMgr.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCPreview.lib\
-        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib\
+        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450.lib\
+        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450d.lib\
+
 
 
 

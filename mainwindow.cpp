@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
 
+    this->setAttribute(Qt::WA_DeleteOnClose);
 
     MainWindow::replaceThisPointer = this;
     centralWidget = new QWidget(this);
@@ -78,9 +79,10 @@ MainWindow::MainWindow(QWidget *parent)
     hikvisionReceive = new hikvisionReceiver();
 
 
-    HWND hwnd = (HWND)this->label->winId();
+//    HWND hwnd = (HWND)this->label->winId();
     NET_DVR_PREVIEWINFO struPlayInfo;
-    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);
+//    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);
+    long previewID = hikvisionReceive->play(NULL, struPlayInfo);
 
 
     qDebug() << "Current Thread ID: " << QThread::currentThreadId();

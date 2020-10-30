@@ -1,5 +1,8 @@
 ﻿#include "receiverhikvision.h"
 
+long nPort;
+
+
 hikvisionReceiver::hikvisionReceiver()
 {
     // hikvision camera sdk initialize
@@ -40,7 +43,7 @@ long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo)
     struPlayInfo.dwLinkMode = 0;    //0- TCP 方式，1- UDP 方式，2- 多播方式，3- RTP 方式，4-RTP/RTSP，5-RSTP/HTTP
     struPlayInfo.bBlocked = 1;      //0- 非阻塞取流，1- 阻塞取流
 
-    long IRealPlayHandle = NET_DVR_RealPlay_V40(userID, &struPlayInfo, NULL, NULL);
+    long IRealPlayHandle = NET_DVR_RealPlay_V40(userID, &struPlayInfo, hikvisionReceiver::fRealDataCallBack, NULL);
 
     if(IRealPlayHandle < 0)
     {
@@ -53,58 +56,111 @@ long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo)
         return IRealPlayHandle;
 }
 
-//void CALLBACK fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser)
-//{
-//    LONG nPort = -1;
-//    switch (dwDataType)
+
+// 解码回调，视频为YUV数据（YV12），音频为PCM数据
+void CALLBACK hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO * pFrameInfo, long nReserved1, long nReserved2)
+{
+    qDebug() << "in DecCBFun";
+
+//    volatile int gbHandling = 3;
+//    if (gbHandling)
 //    {
-//    case NET_DVR_SYSHEAD: //系统头
-//        if (!PlayM4_GetPort(&nPort))  //获取播放库未使用的通道号
-//        {
-//            break;
-//        }
-//        //m_iPort = lPort; //第一次回调的是系统头，将获取的播放库port号赋值给全局port，下次回调数据时即使用此port号播放
-//        if (dwBufSize > 0)
-//        {
-//            if (!PlayM4_SetStreamOpenMode(nPort, STREAME_REALTIME))  //设置实时流播放模式
-//            {
-//                break;
-//            }
-//            if (!PlayM4_OpenStream(nPort, pBuffer, dwBufSize, 10 * 1024 * 1024)) //打开流接口
-//            {
-//                break;
-//            }
-//            if (!PlayM4_Play(nPort, NULL)) //播放开始
-//            {
-//                break;
-//            }
-//            if (!PlayM4_SetDecCallBack(nPort, DecCBFun))
-//            {
-//                break;
-//            }
-//        }
-//        break;
-//    case NET_DVR_STREAMDATA:   //码流数据
-//        if (dwBufSize > 0 && nPort != -1)
-//        {
-//            if (!PlayM4_InputData(nPort, pBuffer, dwBufSize))
-//            {
-//                cout << "error" << PlayM4_GetLastError(nPort) << endl;
-//                break;
-//            }
-//        }
-//        break;
-//    default: //其他数据
-//        if (dwBufSize > 0 && nPort != -1)
-//        {
-//            if (!PlayM4_InputData(nPort, pBuffer, dwBufSize))
-//            {
-//                break;
-//            }
-//        }
-//        break;
+//        gbHandling--;
+//        return;
 //    }
-//}
+    qDebug() << "in DecCBFun2423425";
+
+    long lFrameType = pFrameInfo->nType;
+
+    if (lFrameType == T_YV12)
+    {
+        //LARGE_INTEGER t1, t2, tc;
+        //QueryPerformanceFrequency(&tc);
+        //QueryPerformanceCounter(&t1);
+        qDebug() << "in Opencv";
+        cv::Mat pImg(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3);
+        cv::Mat src(pFrameInfo->nHeight + pFrameInfo->nHeight / 2, pFrameInfo->nWidth, CV_8UC1, pBuf);
+
+        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2BGR);
+        cv::imshow("IPCamera", pImg);
+        cv::waitKey(1);
+        //QueryPerformanceCounter(&t2);
+        //printf("time is %f\n", (t2.QuadPart - t1.QuadPart)*1.0 / tc.QuadPart);
+    }
+//    gbHandling = 3;
+}
+
+
+void CALLBACK hikvisionReceiver::fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser)
+{
+//    LONG nPort = -1;
+    switch (dwDataType)
+    {
+    // 第一次先进入系统头
+    case NET_DVR_SYSHEAD: //系统头
+        qDebug() << "in the xitongtou!";
+
+        if (!PlayM4_GetPort(&nPort))  //获取播放库未使用的通道号，nPort应该是不同路摄像头的标识。
+        {
+            break;
+        }
+        qDebug() << "nPort = " << nPort;
+
+        //m_iPort = lPort; //第一次回调的是系统头，将获取的播放库port号赋值给全局port，下次回调数据时即使用此port号播放
+        if (dwBufSize > 0)
+        {
+            qDebug() << "dwBufSize > 0";
+
+            if (!PlayM4_SetStreamOpenMode(nPort, STREAME_REALTIME))  //设置实时流播放模式
+            {
+                break;
+            }
+            qDebug() << "dwBufSize > 1";
+
+            if (!PlayM4_OpenStream(nPort, pBuffer, dwBufSize, 10 * 1024 * 1024)) //打开流接口
+            {
+                break;
+            }
+            qDebug() << "dwBufSize > 2";
+
+            if (!PlayM4_Play(nPort, NULL)) //播放开始
+            {
+                break;
+            }
+            qDebug() << "dwBufSize > 3";
+
+            // 设置解码回调函数
+
+            if (!PlayM4_SetDecCallBack(nPort, hikvisionReceiver::DecCBFun))
+            {
+                qDebug() << "dwBufSize > 4";
+                break;
+            }
+        }
+        break;
+    case NET_DVR_STREAMDATA:   //码流数据
+        // 第二次进入
+        if (dwBufSize > 0 && nPort != -1)
+        {
+            if (!PlayM4_InputData(nPort, pBuffer, dwBufSize))
+            {
+                qDebug() << "error" << PlayM4_GetLastError(nPort) << endl;
+                break;
+            }
+        }
+        break;
+    default: //其他数据
+        qDebug() << "in other";
+        if (dwBufSize > 0 && nPort != -1)
+        {
+            if (!PlayM4_InputData(nPort, pBuffer, dwBufSize))
+            {
+                break;
+            }
+        }
+        break;
+    }
+}
 
 
 hikvisionReceiver::~hikvisionReceiver(){
