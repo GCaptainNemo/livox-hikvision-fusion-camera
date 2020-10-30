@@ -13,6 +13,7 @@
 #include <QWidget>
 #include <QLabel>
 #include <QSplitter>
+
 #include "receiverhikvision.h"
 
 
@@ -92,6 +93,7 @@ protected:
     QWidget * centralWidget;
     QHBoxLayout * centralHLayout;
     QLabel * label;
+    QSplitter * hsplitter;
 
     renderWindow * renderRgbPCWidget;
     hikvisionReceiver * hikvisionReceive;

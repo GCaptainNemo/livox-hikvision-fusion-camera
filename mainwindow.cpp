@@ -68,11 +68,15 @@ MainWindow::MainWindow(QWidget *parent)
     centralHLayout = new QHBoxLayout();
 
     label = new QLabel(centralWidget);
-
+    hsplitter = new QSplitter(Qt::Horizontal, this);
 
     renderRgbPCWidget = new renderWindow(centralWidget);
-    centralHLayout->addWidget(this->renderRgbPCWidget);
-    centralHLayout->addWidget(this->label);
+    hsplitter->addWidget(this->renderRgbPCWidget);
+    hsplitter->addWidget(this->label);
+    centralHLayout->addWidget(hsplitter);
+
+//    centralHLayout->addWidget(this->renderRgbPCWidget);
+//    centralHLayout->addWidget(this->label);
     centralWidget->setLayout(centralHLayout);
     this->setCentralWidget(centralWidget);
 
@@ -82,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    HWND hwnd = (HWND)this->label->winId();
     NET_DVR_PREVIEWINFO struPlayInfo;
 //    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);
-    long previewID = hikvisionReceive->play(NULL, struPlayInfo);
+    long previewID = hikvisionReceive->play(NULL, struPlayInfo, label);
 
 
     qDebug() << "Current Thread ID: " << QThread::currentThreadId();

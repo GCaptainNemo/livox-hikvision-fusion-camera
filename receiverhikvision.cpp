@@ -1,7 +1,7 @@
 ﻿#include "receiverhikvision.h"
 
 long nPort;
-
+QLabel * hikvisionReceiver::displayLabel = nullptr;
 
 hikvisionReceiver::hikvisionReceiver()
 {
@@ -34,8 +34,9 @@ hikvisionReceiver::hikvisionReceiver()
 }
 
 
-long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo)
+long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo, QLabel * label)
 {
+    hikvisionReceiver::displayLabel = label;
     struPlayInfo = {0};
     struPlayInfo.hPlayWnd = hWnd;   //需要 SDK 解码时句柄设为有效值，仅取流不解码时可设为空
     struPlayInfo.lChannel = 1;      //预览通道号
@@ -54,6 +55,7 @@ long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo)
     }
     else
         return IRealPlayHandle;
+
 }
 
 
@@ -81,9 +83,16 @@ void CALLBACK hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, F
         cv::Mat pImg(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3);
         cv::Mat src(pFrameInfo->nHeight + pFrameInfo->nHeight / 2, pFrameInfo->nWidth, CV_8UC1, pBuf);
 
-        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2BGR);
-        cv::imshow("IPCamera", pImg);
-        cv::waitKey(1);
+//        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2BGR);
+        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2RGB);
+        QImage Img = QImage((const uchar * )(pImg.data), pImg.cols, pImg.rows, pImg.cols * pImg.channels(), QImage::Format_RGB888);
+        hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(Img));
+        hikvisionReceiver::displayLabel->setMaximumWidth(700);
+
+//        cv::imshow("IPCamera", pImg);
+//        cv::waitKey(1);
+
+
         //QueryPerformanceCounter(&t2);
         //printf("time is %f\n", (t2.QuadPart - t1.QuadPart)*1.0 / tc.QuadPart);
     }
