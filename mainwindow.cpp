@@ -212,16 +212,14 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
         }
         else if ( data ->data_type == kExtendCartesian)
         {
-            if (MainWindow::bufferVertexCount < 10000)
+            if (MainWindow::bufferVertexCount < 1000)
             {
 
             MainWindow::bufferVertexCount += 1;
             LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
 
 
-//            MainWindow::vector_qmutex.lock();
             renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
-//            MainWindow::vector_qmutex.unlock();
 
             renderWindow::vertices_reflectivity << p_point_data->reflectivity;
             }

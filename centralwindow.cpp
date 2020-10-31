@@ -4,7 +4,7 @@
 
 #include <gl/GLU.h>
 #include <GL/glut.h>
-
+QMutex renderWindow::qmutex;
 QVector<QVector3D> renderWindow::vertices_positions = {};
 QVector<uint8_t> renderWindow::vertices_reflectivity = {};
 QVector<QVector3D> renderWindow::vertices_buffer = {};
@@ -41,11 +41,13 @@ void renderWindow::updateWindowSLOT()
 
 void renderWindow::initializeGL()
 {
-    // 为当前环境初始化OpenGL函数,此时QOpenglFunctions对象只可以使用这个上下文。
+    // 为当前context初始化OpenGL函数
+    // 此时QOpenglFunctions对象只可以使用这个上下文。
     initializeOpenGLFunctions();
 //    glutInit(0, nullptr);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
 
 
 
@@ -92,13 +94,17 @@ void renderWindow::resizeGL(int w,int h)
 void renderWindow::paintGL()
 {
     // qDebug() << "REPAINT AGAIN!!!!!";
+    // 获得当下的上下文
+    QOpenGLExtraFunctions  * f = QOpenGLContext::currentContext()->extraFunctions();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    f->glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
+
     // gluLookAt creates a viewing matrix derived from an eye point,
     // a reference point indicating the center of the scene, and an UP vector.
-    gluLookAt(eyex * 0.1, eyey * 0.1,eyez * 0.1, 0, 0, 0, upx * 0.1, upy * 0.1, upz * 0.1);
+
+    gluLookAt(eyex * 0.1, eyey * 0.1, eyez * 0.1, 0, 0, 0, upx * 0.1, upy * 0.1, upz * 0.1);
 //    glPointSize(3);
     glScalef(TempscaleFactor, TempscaleFactor, TempscaleFactor);
     drawCoordinate();
@@ -149,10 +155,12 @@ void renderWindow::paintGL()
 
 void renderWindow::drawShape()
 {
+    renderWindow::qmutex.lock();
     qDebug() << "length = " << renderWindow::vertices_buffer.length();
     glPointSize(3);
-    for(int i=0; i<renderWindow::vertices_buffer.length(); i++)
+    for(int i=0; i < renderWindow::vertices_buffer.length(); i++)
     {
+
         glBegin(GL_QUADS);
         glColor4f(renderWindow::reflectivity_buffer[i], 0, 0, 0);
             glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
@@ -169,8 +177,10 @@ void renderWindow::drawShape()
                     renderWindow::vertices_buffer[i].z()/ 1000);
         glEnd();
     }
+
     renderWindow::vertices_buffer.clear();
     renderWindow::reflectivity_buffer.clear();
+    renderWindow::qmutex.unlock();
 }
 
 

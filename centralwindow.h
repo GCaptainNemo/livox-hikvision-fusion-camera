@@ -1,6 +1,6 @@
 ﻿#ifndef CENTRALWINDOW_H
 #define CENTRALWINDOW_H
-
+#include <gl/glew.h>
 #include <QWidget>
 
 #include <QOpenGLWidget>
@@ -13,6 +13,9 @@
 #include <QGLWidget>
 #include <QMouseEvent>
 #include <QLabel>
+#include <QOpenGLExtraFunctions>
+#include <QMutex>
+
 #define M_PI 3.1415
 
 class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
@@ -49,6 +52,8 @@ public:
     void RotateViewPoint();
     void drawCoordinate();
     void drawShape();
+    static QMutex qmutex;
+
 
 
 protected:

@@ -17,6 +17,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    batch.cpp \
+    batchmanager.cpp \
     centralwindow.cpp \
     frontendinfo.cpp \
     main.cpp \
@@ -25,6 +27,8 @@ SOURCES += \
     receiverlivox.cpp
 
 HEADERS += \
+    batch.h \
+    batchmanager.h \
     centralwindow.h \
     frontendinfo.h \
     mainwindow.h \
@@ -40,7 +44,8 @@ INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/F
                C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
                D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
                C:/opencv/opencv/build/include\
-               C:/opencv/opencv\build\include\opencv2\
+               C:/opencv/opencv/build/include/opencv2\
+               D:/glm/glm\
 
 
 
@@ -60,6 +65,7 @@ LIBS += kernel32.lib\
         OpenGL32.Lib\
         GlU32.Lib\
         glut32.lib\
+        glew32.lib\
         C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\
@@ -72,5 +78,7 @@ LIBS += kernel32.lib\
 
 
 
+
+# C:\Program Files (x86)\Windows Kits\10\Lib\10.0.17763.0\um\x64\ opengl library
 
 
