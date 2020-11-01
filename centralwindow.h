@@ -15,6 +15,8 @@
 #include <QLabel>
 #include <QOpenGLExtraFunctions>
 #include <QMutex>
+#include <QOpenGLContext>
+#include "batchmanager.h"
 
 #define M_PI 3.1415
 
@@ -52,6 +54,10 @@ public:
     void RotateViewPoint();
     void drawCoordinate();
     void drawShape();
+    QOpenGLExtraFunctions * extrafunctions;
+
+    BatchManager * batchManager;
+
     static QMutex qmutex;
 
 

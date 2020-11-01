@@ -10,7 +10,6 @@ uint32_t MainWindow::data_receive_count = 0;
 int MainWindow::bufferVertexCount = 0;
 
 MainWindow* MainWindow::replaceThisPointer = nullptr;
-QMutex MainWindow::vector_qmutex;
 
 char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
@@ -212,29 +211,27 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
         }
         else if ( data ->data_type == kExtendCartesian)
         {
-            if (MainWindow::bufferVertexCount < 1000)
+            if (MainWindow::bufferVertexCount < 1500)
             {
 
-            MainWindow::bufferVertexCount += 1;
-            LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
+                MainWindow::bufferVertexCount += 1;
+                LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
 
+                renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
 
-            renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
+//                renderWindow::vertices_reflectivity << p_point_data->reflectivity;
+                MainWindow::replaceThisPointer->renderRgbPCWidget->batchManager->add(renderWindow::vertices_positions , new BatchConfig(0x00, 0, 0));
 
-            renderWindow::vertices_reflectivity << p_point_data->reflectivity;
             }
             else
             {
-//                MainWindow::vector_qmutex.lock();
 
-                renderWindow::vertices_buffer.swap(renderWindow::vertices_positions);
-                renderWindow::reflectivity_buffer.swap(renderWindow::vertices_reflectivity);
+//                renderWindow::vertices_buffer.swap(renderWindow::vertices_positions);
+//                renderWindow::reflectivity_buffer.swap(renderWindow::vertices_reflectivity);
 
                 replaceThisPointer->renderRgbPCWidget->update();
 
-//                MainWindow::vector_qmutex.lock();
-                qDebug() << "vertices_positions's length = " << renderWindow::vertices_positions.length();
-//                MainWindow::vector_qmutex.unlock();
+//                qDebug() << "vertices_positions's length = " << renderWindow::vertices_positions.length();
                 MainWindow::bufferVertexCount = 0;
             }
         }

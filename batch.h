@@ -6,7 +6,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 #include <QOpenGLExtraFunctions>
-
+#include <gl/GL.h>
 //#include <gl/glew.h>
 //#pragma comment(lib, "glew32.lib")
 
@@ -92,6 +92,7 @@ public:
     Batch* getFullest( Batch* pBatch );
     int getPriority() const;
 
+    void emptyData();
     void add( const std::vector<GuiVertex>& vVertices, const BatchConfig& config );
     void add( const std::vector<GuiVertex>& vVertices );
     void render();

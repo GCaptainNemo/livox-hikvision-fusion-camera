@@ -17,11 +17,12 @@ class BatchManager
         std::vector<Batch*> _vBatches;
         unsigned _uNumBatches;
         unsigned _maxNumVerticesPerBatch;
+        QOpenGLExtraFunctions * extraFunctions;
 
         //^^^^------ variables above ------|------ functions below ------vvvv
 
     public:
-        BatchManager( unsigned uNumBatches, unsigned numVerticesPerBatch );
+        BatchManager( unsigned uNumBatches, unsigned numVerticesPerBatch, QOpenGLExtraFunctions * e );
         ~BatchManager();
 
         void render( const std::vector<GuiVertex>& vVertices, const BatchConfig& config );
@@ -34,6 +35,7 @@ class BatchManager
         BatchManager& operator=( const BatchManager& c ); //not implemented
 
         void emptyBatch( bool emptyAll, Batch* pBatchToEmpty );
+        void emptyBatch(Batch* pBatchToEmpty );
 };//BatchManager
 
 

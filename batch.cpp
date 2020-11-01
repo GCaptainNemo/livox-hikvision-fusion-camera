@@ -5,6 +5,7 @@ Batch::Batch(unsigned uMaxNumVertices, QOpenGLExtraFunctions * e):
     _uNumUsedVertices( 0 ), _vao( 0 ), _vbo( 0 ),
     _config(GL_TRIANGLE_STRIP, 0, 0 ), _lastVertex( glm::vec2(), glm::vec4() )
 {
+    defaultBatchConfig = new BatchConfig(0, 0, 0);
     //batch最好的尺寸在1-4MB. Number of elements that can be stored in a
     //batch is determined by calculating #bytes used by each vertex
 
@@ -32,8 +33,9 @@ Batch::Batch(unsigned uMaxNumVertices, QOpenGLExtraFunctions * e):
     // 绑定名字为_vbo的VBO，Target是VBO绑定的目标，GL_ARRAY_BUFFER是顶点属性、GL_TEXTURE_BUFFER 纹理属性。
     extraFunctions->glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
-    // Target同上，size是VBO新数据的尺寸，data=nullptr是数据，usage是数据存储的期望使用模式，
-    // 比如GL_STREAM_READ....
+    // Target同上，size是VBO新数据的尺寸，data=nullptr是数据若为null则代表仅预留这么多的空间，
+    // usage是数据存储的期望使用模式，
+    // 比如GL_STREAM_READ...., GL_STREAM_DRAW使用显存
     extraFunctions->glBufferData(GL_ARRAY_BUFFER,
                                  uMaxNumVertices * sizeof( GuiVertex ), nullptr, GL_STREAM_DRAW );
     // opengl version > 3.0
@@ -61,6 +63,16 @@ Batch::Batch(unsigned uMaxNumVertices, QOpenGLExtraFunctions * e):
 }
 
 Batch::~Batch() { cleanUp(); }
+
+
+void Batch::emptyData()
+{
+    // 清空VBO中的数据
+    extraFunctions->glBufferData(GL_ARRAY_BUFFER,
+                                 _uMaxNumVertices * sizeof( GuiVertex ), nullptr, GL_STREAM_DRAW );
+    _uNumUsedVertices = 0;
+}
+
 
 void Batch::cleanUp()
 {
@@ -111,13 +123,13 @@ Batch* Batch::getFullest( Batch* pBatch )
 
 //------------------------------------------------------------------------
 
-int Batch::getPriority() const { return _config.iPriority; }
+// int Batch::getPriority() const { return _config.iPriority; }
 
 //getPriority
 //------------------------------------------------------------------------
 //adds vertices to batch and also sets the batch config options
 
-void Batch::add( const std::vector<GuiVertex>& vVertices, const BatchConfig& config )
+void Batch::add( const std::vector<GuiVertex>& vVertices, const BatchConfig & config )
 { _config = config; add( vVertices ); }
 
 //add
@@ -199,43 +211,44 @@ void Batch::render()
         return;
     }
 
-    bool usingTexture = INVALID_UNSIGNED != _config.uTextureId;
+//    bool usingTexture = INVALID_UNSIGNED != _config.uTextureId;
 
-    ShaderManager::setUniform( U_USING_TEXTURE, usingTexture );
+//    ShaderManager::setUniform( U_USING_TEXTURE, usingTexture );
 
-    if( usingTexture )
-    {
-        ShaderManager::setTexture( 0, U_TEXTURE0_SAMPLER_2D, _config.uTextureId );
-    }
+//    if( usingTexture )
+//    {
+//        ShaderManager::setTexture( 0, U_TEXTURE0_SAMPLER_2D, _config.uTextureId );
+//    }
 
-    ShaderManager::setUniform( U_TRANSFORM_MATRIX, _config.transformMatrix );
-    //draw contents of buffer
+//    ShaderManager::setUniform( U_TRANSFORM_MATRIX, _config.transformMatrix );
+//    //draw contents of buffer
 
     if( glGetString(GL_VERSION)[0] - 48 >= 3 )
     {
+        // glDrawArrays 绘画模式mode,第一个顶点索引，渲染的顶点个数
         extraFunctions->glBindVertexArray( _vao );
         extraFunctions->glDrawArrays( _config.uRenderType, 0, _uNumUsedVertices );
         extraFunctions->glBindVertexArray( 0 );
     }
-    else
-    {
-        //OpenGL v2.x
-        extraFunctions->glBindBuffer( GL_ARRAY_BUFFER, _vbo );
-        unsigned uOffset = 0;
-        ShaderManager::enableAttribute( A_POSITION, sizeof( GuiVertex ), uOffset );
-        uOffset += sizeof( glm::vec2 );
-        ShaderManager::enableAttribute( A_COLOR, sizeof( GuiVertex ), uOffset );
-        uOffset += sizeof( glm::vec4 );
-        ShaderManager::enableAttribute( A_TEXTURE_COORD0, sizeof( GuiVertex ), uOffset );
-        extraFunctions->glDrawArrays( _config.uRenderType, 0, _uNumUsedVertices );
-        ShaderManager::disableAttribute( A_POSITION );
-        ShaderManager::disableAttribute( A_COLOR );
-        ShaderManager::disableAttribute( A_TEXTURE_COORD0 );
-        extraFunctions->glBindBuffer( GL_ARRAY_BUFFER, 0 );
-    }
+//    else
+//    {
+//        //OpenGL v2.x
+//        extraFunctions->glBindBuffer( GL_ARRAY_BUFFER, _vbo );
+//        unsigned uOffset = 0;
+//        ShaderManager::enableAttribute( A_POSITION, sizeof( GuiVertex ), uOffset );
+//        uOffset += sizeof( glm::vec2 );
+//        ShaderManager::enableAttribute( A_COLOR, sizeof( GuiVertex ), uOffset );
+//        uOffset += sizeof( glm::vec4 );
+//        ShaderManager::enableAttribute( A_TEXTURE_COORD0, sizeof( GuiVertex ), uOffset );
+//        extraFunctions->glDrawArrays( _config.uRenderType, 0, _uNumUsedVertices );
+//        ShaderManager::disableAttribute( A_POSITION );
+//        ShaderManager::disableAttribute( A_COLOR );
+//        ShaderManager::disableAttribute( A_TEXTURE_COORD0 );
+//        extraFunctions->glBindBuffer( GL_ARRAY_BUFFER, 0 );
+//    }
 
     //reset buffer
-    _uNumUsedVertices = 0;
-    _config.iPriority = 0;
+//    _uNumUsedVertices = 0;
+//    _config.iPriority = 0;
 }//render
 

@@ -13,7 +13,6 @@ QVector<uint8_t> renderWindow::reflectivity_buffer = {};
 //QVector<QVector3D> centralwindow::vertices_colors = {{1, 1, 1} * 1000}
 renderWindow::renderWindow(QWidget *parent) : QOpenGLWidget(parent)
 {
-
     this->eyex = 0.1;
     this->eyey = 0.1;
     this->eyez = 0.1;
@@ -44,9 +43,15 @@ void renderWindow::initializeGL()
     // 为当前context初始化OpenGL函数
     // 此时QOpenglFunctions对象只可以使用这个上下文。
     initializeOpenGLFunctions();
+    extrafunctions =
+            new QOpenGLExtraFunctions(QOpenGLContext::currentContext());
+    batchManager = new BatchManager(15, 1500, extrafunctions);
+
+
 //    glutInit(0, nullptr);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
+
 
 
 
@@ -108,7 +113,8 @@ void renderWindow::paintGL()
 //    glPointSize(3);
     glScalef(TempscaleFactor, TempscaleFactor, TempscaleFactor);
     drawCoordinate();
-    drawShape();
+    batchManager->renderAll();
+//    drawShape();
 
 
 
@@ -155,32 +161,33 @@ void renderWindow::paintGL()
 
 void renderWindow::drawShape()
 {
-    renderWindow::qmutex.lock();
-    qDebug() << "length = " << renderWindow::vertices_buffer.length();
-    glPointSize(3);
-    for(int i=0; i < renderWindow::vertices_buffer.length(); i++)
-    {
 
-        glBegin(GL_QUADS);
-        glColor4f(renderWindow::reflectivity_buffer[i], 0, 0, 0);
-            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
-                    renderWindow::vertices_buffer[i].y() / 1000 + 0.5f,
-                    renderWindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 - 0.5f,
-                    renderWindow::vertices_buffer[i].y() / 1000+ 0.5f,
-                    renderWindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
-                    renderWindow::vertices_buffer[i].y() / 1000- 0.5f,
-                    renderWindow::vertices_buffer[i].z() / 1000);
-            glVertex3f(renderWindow::vertices_buffer[i].x()/ 1000 - 0.5f,
-                    renderWindow::vertices_buffer[i].y()/ 1000 - 0.5f,
-                    renderWindow::vertices_buffer[i].z()/ 1000);
-        glEnd();
-    }
+//    renderWindow::qmutex.lock();
+//    qDebug() << "length = " << renderWindow::vertices_buffer.length();
+//    glPointSize(3);
+//    for(int i=0; i < renderWindow::vertices_buffer.length(); i++)
+//    {
 
-    renderWindow::vertices_buffer.clear();
-    renderWindow::reflectivity_buffer.clear();
-    renderWindow::qmutex.unlock();
+//        glBegin(GL_QUADS);
+//        glColor4f(renderWindow::reflectivity_buffer[i], 0, 0, 0);
+//            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
+//                    renderWindow::vertices_buffer[i].y() / 1000 + 0.5f,
+//                    renderWindow::vertices_buffer[i].z() / 1000);
+//            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 - 0.5f,
+//                    renderWindow::vertices_buffer[i].y() / 1000+ 0.5f,
+//                    renderWindow::vertices_buffer[i].z() / 1000);
+//            glVertex3f(renderWindow::vertices_buffer[i].x() / 1000 + 0.5f,
+//                    renderWindow::vertices_buffer[i].y() / 1000- 0.5f,
+//                    renderWindow::vertices_buffer[i].z() / 1000);
+//            glVertex3f(renderWindow::vertices_buffer[i].x()/ 1000 - 0.5f,
+//                    renderWindow::vertices_buffer[i].y()/ 1000 - 0.5f,
+//                    renderWindow::vertices_buffer[i].z()/ 1000);
+//        glEnd();
+//    }
+
+//    renderWindow::vertices_buffer.clear();
+//    renderWindow::reflectivity_buffer.clear();
+//    renderWindow::qmutex.unlock();
 }
 
 

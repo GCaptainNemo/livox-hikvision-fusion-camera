@@ -73,9 +73,8 @@ public:
 
     static void LidarDisConnect(const DeviceInfo *info);
     static void LidarStateChange(const DeviceInfo *info);
-
+    renderWindow * renderRgbPCWidget;
 public:
-    static QMutex vector_qmutex;
 
     static int lidar_count;
     static uint32_t data_receive_count; //  uint32_t goes from 0 to 2^32 - 1.
@@ -83,7 +82,7 @@ public:
     setLidarThreadObject * setlidar_thread;
     static MainWindow * replaceThisPointer;
     static int bufferVertexCount;
-
+//    static renderWindow * pointerToRenderWindow;
 
 signals:
     void setLidarSIGNAL();
@@ -95,7 +94,7 @@ protected:
     QLabel * label;
     QSplitter * hsplitter;
 
-    renderWindow * renderRgbPCWidget;
+
     hikvisionReceiver * hikvisionReceive;
 };
 
