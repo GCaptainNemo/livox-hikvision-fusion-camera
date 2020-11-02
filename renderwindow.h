@@ -17,7 +17,7 @@
 #include <QMutex>
 #include <QOpenGLContext>
 #include "batchmanager.h"
-
+#include <vector>
 #define M_PI 3.1415
 
 class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
@@ -26,6 +26,7 @@ class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
 public:
     explicit renderWindow(QWidget *parent = nullptr);
     static QVector<QVector3D> vertices_positions;
+
     static QVector<QVector3D> vertices_colors;
     static QVector<uint8_t> vertices_reflectivity;
     static QVector<uint8_t> reflectivity_buffer;

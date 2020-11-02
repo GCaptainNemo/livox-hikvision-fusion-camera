@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <QOpenGLExtraFunctions>
 #include <gl/GL.h>
+#include <QDebug>
 //#include <gl/glew.h>
 //#pragma comment(lib, "glew32.lib")
 
@@ -18,10 +19,10 @@
 // Notice that the GuiVertex defines a 2D coordinate on the screen that can contain a color
 // and a texture coordinate.
 struct GuiVertex {
-    glm::vec2 position;
+    glm::vec3 position;
     glm::vec4 color;
     glm::vec2 texture;
-    GuiVertex( glm::vec2 positionIn, glm::vec4 colorIn, glm::vec2 textureIn = glm::vec2() ) :
+    GuiVertex( glm::vec3 positionIn, glm::vec4 colorIn, glm::vec2 textureIn = glm::vec2() ) :
     position( positionIn ),
     color( colorIn ),
     texture( textureIn )
@@ -79,6 +80,8 @@ private:
     unsigned _vbo;
     BatchConfig _config;
     GuiVertex _lastVertex;    // Vertex attribute position, color, texture. 三角形绘制时采用
+public:
+    BatchConfig * defaultBatchConfig;
     //^^^^------ variables above ------|------ functions below ------vvvv
 
 public:
@@ -90,12 +93,12 @@ public:
     bool isEnoughRoom( unsigned uNumVertices ) const;
 
     Batch* getFullest( Batch* pBatch );
-    int getPriority() const;
+//    int getPriority() const;
 
     void emptyData();
     void add( const std::vector<GuiVertex>& vVertices, const BatchConfig& config );
-    void add( const std::vector<GuiVertex>& vVertices );
-    void render();
+    void add( const std::vector<float> * verticePositions);
+    void draw();
 
 protected:
 private:

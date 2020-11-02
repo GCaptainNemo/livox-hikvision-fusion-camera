@@ -41,17 +41,26 @@ BatchManager::~BatchManager() { _vBatches.clear(); }
 
 
 // -----------------------------------------------------------------------
-void BatchManager::add( const std::vector<GuiVertex> & vVertices, const BatchConfig& config )
+//void BatchManager::add( const std::vector<GuiVertex> & vVertices, const BatchConfig& config )
+//{
+//    _vBatches[BatchManager::buffer_index]->emptyData();
+//    _vBatches[BatchManager::buffer_index]->add(vVertices, config);
+//    buffer_index = (buffer_index + 1) % _uNumBatches;
+//}
+////add data in a vbo(queue)
+
+
+
+
+
+// -----------------------------------------------------------------------
+void BatchManager::add( const std::vector<float> * verticePositions)
 {
 
     _vBatches[BatchManager::buffer_index]->emptyData();
-    _vBatches[BatchManager::buffer_index]->add(vVertices, config);
+    _vBatches[BatchManager::buffer_index]->add(verticePositions);
     buffer_index = (buffer_index + 1) % _uNumBatches;
-    Batch* pEmptyBatch = nullptr;
-    Batch* pFullestBatch = _vBatches[0];
-
 }
-//add data in a vbo(queue)
 
 
 // -----------------------------------------------------------------------
@@ -60,16 +69,14 @@ void BatchManager::renderAll()
 {
     for( unsigned u = 0; u < _uNumBatches; ++u )
     {
-        _vBatches[u]->render();
+        qDebug() << "u = " << u;
+        _vBatches[u]->draw();
     }
-//    _vBatches[BatchManager::buffer_index]->emptyData();
-//    _vBatches[BatchManager::buffer_index]->add(vVertices, config);
-//    buffer_index = (buffer_index + 1) % _uNumBatches;
-//    Batch* pEmptyBatch = nullptr;
-//    Batch* pFullestBatch = _vBatches[0];
 
 }
-//add data in a vbo(queue)
+
+
+//render data in all batch
 
 //------------------------------------------------------------------------
 //void BatchManager::render( const std::vector<GuiVertex> & vVertices, const BatchConfig& config )

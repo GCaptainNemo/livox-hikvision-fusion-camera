@@ -10,6 +10,8 @@ uint32_t MainWindow::data_receive_count = 0;
 int MainWindow::bufferVertexCount = 0;
 
 MainWindow* MainWindow::replaceThisPointer = nullptr;
+std::vector<GuiVertex> MainWindow::vertexVector = {};
+std::vector<float> MainWindow::vertexPositions = {};
 
 char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
@@ -216,23 +218,24 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
 
                 MainWindow::bufferVertexCount += 1;
                 LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
+                MainWindow::vertexPositions.push_back(float(p_point_data->x )/ 1000 );
+                MainWindow::vertexPositions.push_back(float(p_point_data->y )/ 1000 );
+                MainWindow::vertexPositions.push_back(float(p_point_data->z )/ 1000 );
 
-                renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
+//                renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
+//                GuiVertex a (glm::vec3(p_point_data->x / 1000 , p_point_data->y / 1000, p_point_data->z / 1000),
+//                                        glm::vec4(1.0, 0, 0, 0), glm::vec2(0, 0));
 
 //                renderWindow::vertices_reflectivity << p_point_data->reflectivity;
-                MainWindow::replaceThisPointer->renderRgbPCWidget->batchManager->add(renderWindow::vertices_positions , new BatchConfig(0x00, 0, 0));
+//                MainWindow::vertexVector.push_back(a);
 
             }
             else
             {
-
-//                renderWindow::vertices_buffer.swap(renderWindow::vertices_positions);
-//                renderWindow::reflectivity_buffer.swap(renderWindow::vertices_reflectivity);
-
-                replaceThisPointer->renderRgbPCWidget->update();
-
-//                qDebug() << "vertices_positions's length = " << renderWindow::vertices_positions.length();
+                MainWindow::replaceThisPointer->renderRgbPCWidget->batchManager->add(
+                            &MainWindow::vertexPositions);
                 MainWindow::bufferVertexCount = 0;
+                MainWindow::vertexPositions = {};
             }
         }
         else if ( data ->data_type == kExtendSpherical)

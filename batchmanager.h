@@ -2,6 +2,7 @@
 #define BATCHMANAGER_H
 
 #include <vector>
+#include <QDebug>
 #include "batch.h"
 
 // The BatchManager class is responsible for keeping a pool of batches (_vBatches).
@@ -12,7 +13,9 @@
 // My implementation of the BatchManager is shown below:
 class BatchManager
 {
+    
     public:
+        static int buffer_index;
     private:
         std::vector<Batch*> _vBatches;
         unsigned _uNumBatches;
@@ -25,8 +28,9 @@ class BatchManager
         BatchManager( unsigned uNumBatches, unsigned numVerticesPerBatch, QOpenGLExtraFunctions * e );
         ~BatchManager();
 
-        void render( const std::vector<GuiVertex>& vVertices, const BatchConfig& config );
-
+        void add( const std::vector<GuiVertex>& vVertices, const BatchConfig& config );
+        void add( const std::vector<float> * verticePositions);
+        void renderAll();
         void emptyAll();
 
     protected:

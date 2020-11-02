@@ -8,12 +8,12 @@
 #include <apr_getopt.h>
 #include <QThread>
 #include <QMutex>
-#include "centralwindow.h"
+#include "renderwindow.h"
 #include <QHBoxLayout>
 #include <QWidget>
 #include <QLabel>
 #include <QSplitter>
-
+#include <vector>
 #include "receiverhikvision.h"
 
 
@@ -74,6 +74,9 @@ public:
     static void LidarDisConnect(const DeviceInfo *info);
     static void LidarStateChange(const DeviceInfo *info);
     renderWindow * renderRgbPCWidget;
+    static std::vector<GuiVertex> vertexVector;
+    static std::vector<float> vertexPositions;
+
 public:
 
     static int lidar_count;

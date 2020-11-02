@@ -1,4 +1,4 @@
-﻿#include "centralwindow.h"
+﻿#include "renderwindow.h"
 #define GLUT_DISABLE_ATEXIT_HACK
 
 
@@ -45,7 +45,7 @@ void renderWindow::initializeGL()
     initializeOpenGLFunctions();
     extrafunctions =
             new QOpenGLExtraFunctions(QOpenGLContext::currentContext());
-    batchManager = new BatchManager(15, 1500, extrafunctions);
+    batchManager = new BatchManager(15, 4500, extrafunctions);
 
 
 //    glutInit(0, nullptr);

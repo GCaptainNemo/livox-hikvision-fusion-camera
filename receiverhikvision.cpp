@@ -62,41 +62,20 @@ long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo, QLabel
 // 解码回调，视频为YUV数据（YV12），音频为PCM数据
 void CALLBACK hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO * pFrameInfo, long nReserved1, long nReserved2)
 {
-    qDebug() << "in DecCBFun";
-
-//    volatile int gbHandling = 3;
-//    if (gbHandling)
-//    {
-//        gbHandling--;
-//        return;
-//    }
-    qDebug() << "in DecCBFun2423425";
 
     long lFrameType = pFrameInfo->nType;
 
     if (lFrameType == T_YV12)
     {
-        //LARGE_INTEGER t1, t2, tc;
-        //QueryPerformanceFrequency(&tc);
-        //QueryPerformanceCounter(&t1);
-        qDebug() << "in Opencv";
         cv::Mat pImg(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3);
         cv::Mat src(pFrameInfo->nHeight + pFrameInfo->nHeight / 2, pFrameInfo->nWidth, CV_8UC1, pBuf);
 
-//        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2BGR);
         cv::cvtColor(src, pImg, cv::COLOR_YUV420p2RGB);
         QImage Img = QImage((const uchar * )(pImg.data), pImg.cols, pImg.rows, pImg.cols * pImg.channels(), QImage::Format_RGB888);
         hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(Img));
         hikvisionReceiver::displayLabel->setMaximumWidth(700);
 
-//        cv::imshow("IPCamera", pImg);
-//        cv::waitKey(1);
-
-
-        //QueryPerformanceCounter(&t2);
-        //printf("time is %f\n", (t2.QuadPart - t1.QuadPart)*1.0 / tc.QuadPart);
     }
-//    gbHandling = 3;
 }
 
 

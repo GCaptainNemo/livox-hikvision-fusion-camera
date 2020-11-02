@@ -19,21 +19,21 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
     batch.cpp \
     batchmanager.cpp \
-    centralwindow.cpp \
     frontendinfo.cpp \
     main.cpp \
     mainwindow.cpp \
     receiverhikvision.cpp \
-    receiverlivox.cpp
+    receiverlivox.cpp \
+    renderwindow.cpp
 
 HEADERS += \
     batch.h \
     batchmanager.h \
-    centralwindow.h \
     frontendinfo.h \
     mainwindow.h \
     receiverhikvision.h \
-    receiverlivox.h
+    receiverlivox.h \
+    renderwindow.h
 
 
 INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
