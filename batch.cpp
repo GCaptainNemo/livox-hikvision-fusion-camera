@@ -146,6 +146,7 @@ void Batch::draw()
     if( _uNumUsedVertices == 0 )
     {
         //nothing in this buffer to render
+        qDebug() << "nothing to render!";
         return;
     }
     glColor4d(1.0, 0, 0, 0);

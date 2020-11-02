@@ -13,18 +13,23 @@ QVector<uint8_t> renderWindow::reflectivity_buffer = {};
 //QVector<QVector3D> centralwindow::vertices_colors = {{1, 1, 1} * 1000}
 renderWindow::renderWindow(QWidget *parent) : QOpenGLWidget(parent)
 {
-    this->eyex = 0.1;
-    this->eyey = 0.1;
-    this->eyez = 0.1;
+    this->eyex = 0;
+    this->eyey = 0;
+    this->eyez = 1;
 
     this->upx = 0;
-    this->upy = 0.1;
+    this->upy = 1;
     this->upz = 0;
 
-    this->CurrentAngleZ = 0;
-    this->CurrentAngleY = 0;
-    LastAngleZ = M_PI / 4;
-    LastAngleY = M_PI / 4;
+//    this->CurrentAngleX = 0;
+//    this->CurrentAngleY = 0;
+//    this->LastAngleX = M_PI / 2;
+//    this->LastAngleY = M_PI / 2;
+//    this->LastAngleZ = 0.95532;   // 与z轴正向的夹角
+//    this->LastAngleY = 0.95532;
+
+    this->xRotateAngle = 0;
+    this->yRotateAngle = 0;
 
     this->TempscaleFactor = 1;
 
@@ -108,12 +113,15 @@ void renderWindow::paintGL()
 
     // gluLookAt creates a viewing matrix derived from an eye point,
     // a reference point indicating the center of the scene, and an UP vector.
-
+    // eye:相机光心所在的位置  center: 相机朝向的位置， up：相机的顶部在的位置（可以歪着头看）
     gluLookAt(eyex * 0.1, eyey * 0.1, eyez * 0.1, 0, 0, 0, upx * 0.1, upy * 0.1, upz * 0.1);
 //    glPointSize(3);
     glScalef(TempscaleFactor, TempscaleFactor, TempscaleFactor);
+    glRotatef(yDeltaRotateAngle, 0, 1, 0);
+    glRotatef(xDeltaRotateAngle, 1, 0, 0);
+
     drawCoordinate();
-    batchManager->renderAll();
+//    batchManager->renderAll();
 //    drawShape();
 
 
@@ -202,34 +210,11 @@ void renderWindow::mouseMoveEvent(QMouseEvent *event)
 
 void renderWindow::RotateViewPoint()
 {
-    float avAnale = M_PI / 180 * 0.6; //把每次移动的角度单位化
+//    float avAnale = M_PI / 180 * 0.6; //把每次移动的角度单位化
+    float avAnale = 0.6; //把每次移动的角度单位化
+    this->yDeltaRotateAngle  = (EndPoint.x() - StartPoint.x()) * avAnale ;
+    this->xDeltaRotateAngle  = -(EndPoint.x() - StartPoint.x()) * avAnale ;
 
-    /*把每次移动点跟开始按下鼠标记录的点作差，然后乘以avAngle,最后把上一次释放鼠标后时记录的
-      角度相加起来*/
-    CurrentAngleZ = (EndPoint.x() - StartPoint.x()) * avAnale;
-    CurrentAngleZ += LastAngleZ;
-    CurrentAngleY = (EndPoint.y()-StartPoint.y()) * avAnale;
-    CurrentAngleY += LastAngleY;
-
-    QVector3D vector1(sin(CurrentAngleY) * sin(CurrentAngleZ), cos(CurrentAngleY), sin(CurrentAngleY) * cos(CurrentAngleZ));
-    vector1 = vector1.normalized();  //将坐标单位化
-    eyex = vector1.x();
-    eyey = vector1.y();
-    eyez = vector1.z();
-
-    /*主要计算第三组坐标*/
-    QVector3D vectorA(0, sin(CurrentAngleY), 0);
-    QVector3D vectorB = QVector3D(0, 0, 0)-QVector3D(sin(CurrentAngleY) * sin(CurrentAngleZ),
-                                                     0, sin(CurrentAngleY) * cos(CurrentAngleZ));
-    QVector3D vectorAB = QVector3D::crossProduct(vectorA,vectorB);
-
-
-    QVector3D vectorC = QVector3D(0, 0, 0) - vector1;
-    QVector3D vector2 = QVector3D::crossProduct(vectorC, vectorAB);
-    vector2=vector2.normalized();
-    upx = vector2.x();
-    upy = vector2.y();
-    upz = vector2.z();
 }
 
 void renderWindow::drawCoordinate()
@@ -282,8 +267,11 @@ void renderWindow::mousePressEvent(QMouseEvent *event)
 void renderWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     /*记录上一次的角度*/
-    LastAngleZ = CurrentAngleZ;
-    LastAngleY = CurrentAngleY;
+//    LastAngleX = CurrentAngleX;
+//    LastAngleY = CurrentAngleY;
+
+    this->xRotateAngle -= this->xDeltaRotateAngle;
+    this->yRotateAngle += this->yDeltaRotateAngle;
 
 }
 
@@ -294,7 +282,7 @@ void renderWindow::mouseReleaseEvent(QMouseEvent *event)
 void renderWindow::wheelEvent(QWheelEvent *event)
 {
 
-    qDebug() << "event->delta() = " << event->delta();
+
     if (event->delta() >= 0){
         this->scaleVariable(0.1);
     }

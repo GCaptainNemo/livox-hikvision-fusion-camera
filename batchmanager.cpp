@@ -6,21 +6,6 @@ BatchManager::BatchManager( unsigned uNumBatches, unsigned numVerticesPerBatch, 
     _uNumBatches( uNumBatches ), _maxNumVerticesPerBatch( numVerticesPerBatch ), extraFunctions(e)
 {
 
-//    //test input parameters
-//    if( uNumBatches < 10 )
-//    {
-//        std::ostringstream strStream;
-//        strStream << __FUNCTION__ << " uNumBatches{" << uNumBatches << "} is too small. Choose a number >= 10 ";
-
-//        throw ExceptionHandler( strStream );
-//    }
-//    if( numVerticesPerBatch < 1000 )
-//    {
-//        std::ostringstream strStream;
-//        strStream << __FUNCTION__ << " numVerticesPerBatch{" << numVerticesPerBatch << "} is too small. Choose a number >= 1000 ";
-//        throw ExceptionHandler( strStream );
-//    }
-
 //    //a good size for each batch is between 1-4MB in size. Number of elements that can be stored in a
 //    //batch is determined by calculating #bytes used by each vertex
 

@@ -10,14 +10,15 @@
 #include <QOpenGLShaderProgram>
 #include <QVector3D>
 #include <QTimer>
-#include <QGLWidget>
+
 #include <QMouseEvent>
 #include <QLabel>
 #include <QOpenGLExtraFunctions>
 #include <QMutex>
 #include <QOpenGLContext>
-#include "batchmanager.h"
 #include <vector>
+#include "batchmanager.h"
+
 #define M_PI 3.1415
 
 class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
@@ -46,10 +47,17 @@ public:
     GLdouble upz;
 
 
-    float CurrentAngleZ;     //当前与Z轴的夹角
+    GLdouble xDeltaRotateAngle;
+    GLdouble yDeltaRotateAngle;
+
+    GLdouble xRotateAngle;
+    GLdouble yRotateAngle;
+
+
+    float CurrentAngleX;     //当前与Z轴的夹角
     float CurrentAngleY;     //当前与Y轴的夹角
 
-    float LastAngleZ;        //上一次与Z轴的夹角
+    float LastAngleX;        //上一次与Z轴的夹角
     float LastAngleY;        //上一次与Y轴的夹角
     void scaleVariable(float delta);
     void RotateViewPoint();
