@@ -74,8 +74,6 @@ public:
     static void LidarDisConnect(const DeviceInfo *info);
     static void LidarStateChange(const DeviceInfo *info);
     renderWindow * renderRgbPCWidget;
-    static std::vector<GuiVertex> vertexVector;
-    static std::vector<float> vertexPositions;
 
 public:
 
@@ -85,7 +83,6 @@ public:
     setLidarThreadObject * setlidar_thread;
     static MainWindow * replaceThisPointer;
     static int bufferVertexCount;
-//    static renderWindow * pointerToRenderWindow;
 
 signals:
     void setLidarSIGNAL();

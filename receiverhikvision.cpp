@@ -74,7 +74,6 @@ void CALLBACK hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, F
         QImage Img = QImage((const uchar * )(pImg.data), pImg.cols, pImg.rows, pImg.cols * pImg.channels(), QImage::Format_RGB888);
         hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(Img));
         hikvisionReceiver::displayLabel->setMaximumWidth(700);
-
     }
 }
 

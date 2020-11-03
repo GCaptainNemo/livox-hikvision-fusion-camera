@@ -151,7 +151,7 @@ void Batch::draw()
     }
     glColor4d(1.0, 0, 0, 0);
     extraFunctions->glBindVertexArray( _vao );
-    extraFunctions->glDrawArrays( GL_POINTS, 0, _uNumUsedVertices );
+    extraFunctions->glDrawArrays( GL_POINTS, 0, 1500 );
     extraFunctions->glBindVertexArray( 0 );
 }//render
 

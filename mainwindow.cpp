@@ -10,8 +10,8 @@ uint32_t MainWindow::data_receive_count = 0;
 int MainWindow::bufferVertexCount = 0;
 
 MainWindow* MainWindow::replaceThisPointer = nullptr;
-std::vector<GuiVertex> MainWindow::vertexVector = {};
-std::vector<float> MainWindow::vertexPositions = {};
+//std::vector<GuiVertex> MainWindow::vertexVector = {};
+//std::vector<float> MainWindow::vertexPositions = {};
 
 char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
@@ -142,11 +142,11 @@ void MainWindow::OnDeviceBroadcast(const BroadcastDeviceInfo *info)
     // addlidartoConnect 返回livox_statu
     result = AddLidarToConnect(info->broadcast_code, &handle);
     if (result == kStatusSuccess) {
-    /** Set the point cloud data for a specific Livox LiDAR. */
-    SetDataCallback(handle, GetLidarData, NULL);
-    // setDataCallback, handle是设备的门把，GetLidarData是一个函数指针代表返回的操作，client_data表示用户关于命令的信息。
-    devices[handle].handle = handle;
-    devices[handle].device_state = kDeviceStateDisconnect;
+        /** Set the point cloud data for a specific Livox LiDAR. */
+        SetDataCallback(handle, GetLidarData, NULL);
+        // setDataCallback, handle是设备的门把，GetLidarData是一个函数指针代表返回的操作，client_data表示用户关于命令的信息。
+        devices[handle].handle = handle;
+        devices[handle].device_state = kDeviceStateDisconnect;
     }
 };
 
@@ -216,12 +216,19 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
             if (MainWindow::bufferVertexCount < 1500)
             {
 
-                MainWindow::bufferVertexCount += 1;
                 LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
-                MainWindow::vertexPositions.push_back(float(p_point_data->x )/ 1000 );
-                MainWindow::vertexPositions.push_back(float(p_point_data->y )/ 1000 );
-                MainWindow::vertexPositions.push_back(float(p_point_data->z )/ 1000 );
+                renderWindow::vertexPositions[MainWindow::bufferVertexCount][0] = GLfloat(p_point_data->x) / 1000;
+                renderWindow::vertexPositions[MainWindow::bufferVertexCount][1] = GLfloat(p_point_data->y )/ 1000;
+                renderWindow::vertexPositions[MainWindow::bufferVertexCount][2] = GLfloat(p_point_data->z )/ 1000;
 
+
+                renderWindow::vertexReflectivity[MainWindow::bufferVertexCount][0] = GLfloat(p_point_data->reflectivity) / 128;
+                renderWindow::vertexReflectivity[MainWindow::bufferVertexCount][1] = GLfloat(p_point_data->reflectivity) / 128;
+                renderWindow::vertexReflectivity[MainWindow::bufferVertexCount][2] = GLfloat(p_point_data->reflectivity) / 128;
+
+                MainWindow::bufferVertexCount += 1;
+                //                qDebug() << p_point_data->reflectivity;
+                //
 //                renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
 //                GuiVertex a (glm::vec3(p_point_data->x / 1000 , p_point_data->y / 1000, p_point_data->z / 1000),
 //                                        glm::vec4(1.0, 0, 0, 0), glm::vec2(0, 0));
@@ -232,10 +239,17 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
             }
             else
             {
-                MainWindow::replaceThisPointer->renderRgbPCWidget->batchManager->add(
-                            &MainWindow::vertexPositions);
+                MainWindow::replaceThisPointer->renderRgbPCWidget->update();
+//                MainWindow::replaceThisPointer->renderRgbPCWidget->vbo.write(0,
+//                            &MainWindow::vertexPositions, 1500 * 3 * sizeof(float));
+//                GLuint vPosition = MainWindow::replaceThisPointer->renderRgbPCWidget->program->attributeLocation("vPosition");
+//                MainWindow::replaceThisPointer->renderRgbPCWidget->program->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 0);
+//                glEnableVertexA
+//                MainWindow::replaceThisPointer->renderRgbPCWidget->update();
+
                 MainWindow::bufferVertexCount = 0;
-                MainWindow::vertexPositions = {};
+//                renderWindow::vertexPositions.clear();
+//                renderWindow::vertexReflectivity.clear();
             }
         }
         else if ( data ->data_type == kExtendSpherical)

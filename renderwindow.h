@@ -21,17 +21,19 @@
 
 #define M_PI 3.1415
 
+
+
 class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
 {
     Q_OBJECT
 public:
     explicit renderWindow(QWidget *parent = nullptr);
-    static QVector<QVector3D> vertices_positions;
+    static GLfloat vertexPositions[1500][3];
+    static GLfloat vertexReflectivity[1500][3];
 
-    static QVector<QVector3D> vertices_colors;
-    static QVector<uint8_t> vertices_reflectivity;
-    static QVector<uint8_t> reflectivity_buffer;
-    static QVector<QVector3D> vertices_buffer;
+
+
+//    static QVector<QVector3D> vertices_colors;
 
 
     float TempscaleFactor;
@@ -46,28 +48,24 @@ public:
     GLdouble upy;
     GLdouble upz;
 
-
-    GLdouble xDeltaRotateAngle;
-    GLdouble yDeltaRotateAngle;
-
-    GLdouble xRotateAngle;
-    GLdouble yRotateAngle;
-
-
-    float CurrentAngleX;     //当前与Z轴的夹角
+    float CurrentAngleZ;     //当前与Z轴的夹角
     float CurrentAngleY;     //当前与Y轴的夹角
 
-    float LastAngleX;        //上一次与Z轴的夹角
+    float LastAngleZ;        //上一次与Z轴的夹角
     float LastAngleY;        //上一次与Y轴的夹角
+
+
     void scaleVariable(float delta);
     void RotateViewPoint();
     void drawCoordinate();
     void drawShape();
+    void renderPoint();
     QOpenGLExtraFunctions * extrafunctions;
 
     BatchManager * batchManager;
 
     static QMutex qmutex;
+
 
 
 
@@ -84,6 +82,9 @@ public:
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
+    QOpenGLBuffer vbo;
+    QOpenGLShaderProgram * program;
+
 
 
 
@@ -95,8 +96,6 @@ public slots:
 
 
 private:
-    QOpenGLShaderProgram * program;
-    QOpenGLBuffer vbo;
 
  //   void onMouseClick(int button, int state, int x, int y);
 //    void onKeyboardClick
