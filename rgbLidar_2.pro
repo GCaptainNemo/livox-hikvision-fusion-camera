@@ -24,7 +24,8 @@ SOURCES += \
     mainwindow.cpp \
     receiverhikvision.cpp \
     receiverlivox.cpp \
-    renderwindow.cpp
+    renderwindow.cpp \
+    roamingscenemanager.cpp
 
 HEADERS += \
     batch.h \
@@ -33,10 +34,12 @@ HEADERS += \
     mainwindow.h \
     receiverhikvision.h \
     receiverlivox.h \
-    renderwindow.h
+    renderwindow.h \
+    roamingscenemanager.h
 
 
-INCLUDEPATH += D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
+INCLUDEPATH += D:/glew/glew-2.1.0/include\
+               D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
                D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/spdlog\
                C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt\
                D:/program_cpp/livox_sdk/Livox-SDK/third_party/apr/include\
@@ -65,7 +68,7 @@ LIBS += kernel32.lib\
         OpenGL32.Lib\
         GlU32.Lib\
         glut32.lib\
-        glew32.lib\
+        D:/glew/glew-2.1.0/lib/Release/glew32s.lib\
         C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\

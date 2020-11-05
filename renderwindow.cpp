@@ -1,45 +1,37 @@
 ﻿#include "renderwindow.h"
-#define GLUT_DISABLE_ATEXIT_HACK
+
+#include "gl/GLU.h"
+//#include <GL/glut.h>
+#include <QThread>
 
 
-#include <gl/GLU.h>
-#include <GL/glut.h>
-QMutex renderWindow::qmutex;
-//QVector<QVector3D> renderWindow::vertices_positions = {};
+//int maxNumVertex = 1500;
+
+
 GLfloat renderWindow::vertexPositions[1500][3];
 GLfloat renderWindow::vertexReflectivity[1500][3];
 
 
-//QVector<QVector3D> centralwindow::vertices_colors = {{1, 1, 1} * 1000}
 renderWindow::renderWindow(QWidget *parent) : QOpenGLWidget(parent)
 {
-    eyex = 0;
-    eyey = 0;
-    eyez = 1;
+    QMatrix4x4 lastmatrix;
+//    QMatrix4x4 matrix;
+    glm::vec3 r_axis_world;
+    compareToOrijinScaleFactor = 1;
+    compareToLastScaleFactor = 1;
+    rotateAngle = 0;
+    sceneManager = new RoamingScenceManager();
 
-    upx = 0;
-    upy = 1;
-    upz = 0;
-    CurrentAngleZ=0;
-    CurrentAngleY=0;
-    LastAngleZ=M_PI/4;
-    LastAngleY=M_PI/4;
-//    this->CurrentAngleX = 0;
-//    this->CurrentAngleY = 0;
-//    this->LastAngleX = M_PI / 2;
-//    this->LastAngleY = M_PI / 2;
-//    this->LastAngleZ = 0.95532;   // 与z轴正向的夹角
-//    this->LastAngleY = 0.95532;
+}
 
-
-
-    this->TempscaleFactor = 1;
-
+renderWindow::~renderWindow()
+{
+    delete sceneManager;
 }
 
 void renderWindow::updateWindowSLOT()
 {
-    this->update();
+//    this->update();
 }
 
 
@@ -47,47 +39,85 @@ void renderWindow::updateWindowSLOT()
 
 void renderWindow::initializeGL()
 {
+
     // 为当前context初始化OpenGL函数
     // 此时QOpenglFunctions对象只可以使用这个上下文。
-    initializeOpenGLFunctions();
+//    initializeOpenGLFunctions();
 //    glEnable(GL_DEPTH_TEST);
 //    glEnable(GL_CULL_FACE);
 
+//    // 创建顶点着色器
+//    QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
+//    const char *vertexshader =
+//             "#version 460 core                         \n"
+//             "in vec4 vPosition;                        \n"
+//             "in vec3 vColor;                           \n"
+//             "out vec4 color;                           \n"
+//             "uniform mat4 matrix;                      \n"
+//             "void main() { "
+//             "                                          \n"
+//             "   color = vec4(vColor, 1.0);             \n"
+//             "   gl_Position = matrix * vPosition;      \n"
+//             "}                                         \n";
+//     vshader->compileSourceCode(vertexshader);
+//     // 创建片段着色器
+//     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
+//     const char *fragmentShader =
+//             "#version 460                           \n"
+//             "in vec4 color;                             \n"
+//             "out vec4 fColor;                           \n"
+//             "void main() {                              \n"
+//             "   fColor = color;                         \n"
+//             "}                                          \n";
+//     fshader->compileSourceCode(fragmentShader);
 
-     // 创建顶点着色器
-     QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
-     const char *vertexshader =
-             "#version 450                           \n"
-             "in vec4 vPosition;                        \n"
-             "in vec4 vColor;                           \n"
-             "out vec4 color;                           \n"
-             "uniform mat4 matrix;                      \n"
-             "void main() {                             \n"
-             "   color = vColor;                        \n"
-             "   gl_Position = matrix * vPosition;      \n"
-             "}                                         \n";
-     vshader->compileSourceCode(vertexshader);
-     // 创建片段着色器
-     QOpenGLShader *fshader = new QOpenGLShader(QOpenGLShader::Fragment, this);
-     const char *fragmentShader =
-             "#version 450                           \n"
-             "in vec4 color;                             \n"
-             "out vec4 fColor;                           \n"
-             "void main() {                              \n"
-             "   fColor = color;                         \n"
-             "}                                          \n";
-     fshader->compileSourceCode(fragmentShader);
+////     // 创建着色器程序
+//     program = new QOpenGLShaderProgram;
+//     program->addShader(vshader);
+//     program->addShader(fshader);
 
-     // 创建着色器程序
-     program = new QOpenGLShaderProgram;
-     program->addShader(vshader);
-     program->addShader(fshader);
+//     program->bind();
+//     program->link();
 
-     program->bind();
-     program->link();
+    sceneManager->init();
+    glGenBuffers(1, &VBOID);
+    glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+    glewInit();
+
+    glGenVertexArrays(1, &VAOID);
+
+
 
 };
 
+
+glm::vec2 renderWindow::scaleMouse(glm::vec2 coords, glm::vec2 viewport)
+{
+//    conver x and y to [-1, 1]
+    float newx = static_cast<float>(coords.x * 2.f) / static_cast<float>(viewport.x) - 1.f;
+    float newy = 1.0f - static_cast<float>(coords.y) * 2.f / static_cast<float>(viewport.y);
+    return glm::vec2(glm::vec2(newx, newy));
+};
+
+glm::vec3 renderWindow::projectToSphere(glm::vec2 xy)
+{
+    float d = glm::length(xy);
+
+    glm::vec3 result;
+    float r = 2;
+    if(d < r / sqrtf(2.f))
+    {
+        result.z = sqrtf(r * r - d * d);
+    }
+    else
+    {
+        result.z = r * r / 2 / d;
+    }
+    result.x = xy.x;
+    result.y = xy.y;
+    return glm::normalize(result);
+
+}
 void renderWindow::resizeGL(int w,int h)
 {
 
@@ -96,147 +126,187 @@ void renderWindow::resizeGL(int w,int h)
 
 void renderWindow::paintGL()
 {
-    // 获得当下的上下文
-//    QOpenGLExtraFunctions  * f = QOpenGLContext::currentContext()->extraFunctions();
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    qDebug() << "isCreate = " << vbo.create();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    vbo.bind();
+//    vbo.allocate(
+//                &renderWindow::vertexPositions, 1500 * 6 * sizeof(GLfloat));
+//    qDebug() << "allocate finish";
 
-    // gluLookAt creates a viewing matrix derived from an eye point,
-    // a reference point indicating the center of the scene, and an UP vector.
-    // eye:相机光心所在的位置  center: 相机朝向的位置， up：相机的顶部在的位置（可以歪着头看）
-
-
-    vbo.create();
-    vbo.bind();
-
-    this->vbo.allocate(
-                &renderWindow::vertexPositions, 1500 * 6 * sizeof(float));
-    GLuint vPosition = program->attributeLocation("vPosition");
-    program->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 0);
-    glEnableVertexAttribArray(vPosition);
+//    GLuint vPosition = program->attributeLocation("vPosition");
+//    program->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 0);
+//    glEnableVertexAttribArray(vPosition);
 
 
-    vbo.write(1500 * 3 * sizeof(float),
-              &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(float));
-    GLuint vColor = program->attributeLocation("vColor");
-    program->setAttributeBuffer(vColor, GL_FLOAT, 1500 * 3 * sizeof(float), 3, 0);
+//    vbo.write(1500 * 3 * sizeof(float),
+//              &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(GLfloat));
+//    GLuint vColor = program->attributeLocation("vColor");
+//    program->setAttributeBuffer(vColor, GL_FLOAT, 1500 * 3 * sizeof(GLfloat), 3, 0);
 
-    QMatrix4x4 matrix;
-    matrix.scale(TempscaleFactor, TempscaleFactor, TempscaleFactor);
-    matrix.lookAt(QVector3D(eyex * 0.1, eyey * 0.1, eyez * 0.1),
-                  QVector3D(0, 0, 0),
-                  QVector3D(upx * 0.1, upy * 0.1, upz * 0.1));
-    drawCoordinate();
+////    matrix = lastmatrix;
+////    matrix.scale(compareToLastScaleFactor, compareToLastScaleFactor, compareToLastScaleFactor);
+////    matrix.rotate(rotateAngle, QVector3D(r_axis_world.x, r_axis_world.y, r_axis_world.z));
+//    QMatrix4x4 matrix;
 
-    program->setUniformValue("matrix", matrix);
-    glDrawArrays(GL_POINTS, 0, 1500);
+//    matrix.translate(*sceneManager->TempTranslateVec);
+//    matrix.scale(sceneManager->TempscaleFactor, sceneManager->TempscaleFactor, sceneManager->TempscaleFactor);
+//    matrix.lookAt(*sceneManager->NewEye, *sceneManager->NewView, *sceneManager->NewUp);
+//    //    glLoadIdentity();
+////    glTranslatef(TempTranslateVec->X(),TempTranslateVec->Y(),TempTranslateVec->Z());
+////    glScalef(TempscaleFactor,TempscaleFactor,TempscaleFactor);
+////    gluLookAt(NewEye->X(),NewEye->Y(),NewEye->Z(),
+////              NewView->X(),NewView->Y(),NewView->Z(),
+////              NewUp->X(),NewUp->Y(),NewUp->Z());
 
-//    batchManager->renderAll();
-//    drawShape();
+//    drawCoordinate();
+
+//    program->setUniformValue("matrix", matrix);
+//    glDrawArrays(GL_POINTS, 0, 1500);
+
+    sceneManager->render();
+    glBindBuffer(GL_ARRAY_BUFFER, VBOID);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(renderWindow::vertexPositions),
+                 renderWindow::vertexPositions,
+                 GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(0);
+
 }
 
-void renderWindow::mouseMoveEvent(QMouseEvent *event)
-{
-    QPoint ed(event->pos());
-    EndPoint = ed;
-    RotateViewPoint();
-    this->repaint();
-}
-//    void mouseClickEvent(QMouseEvent *event);
-
-void renderWindow::RotateViewPoint()
-{
-//    float avAnale = M_PI / 180 * 0.6; //把每次移动的角度单位化
-//    float avAnale = 0.6; //把每次移动的角度单位化
-//    this->yDeltaRotateAngle  = (EndPoint.x() - StartPoint.x()) * avAnale ;
-//    this->xDeltaRotateAngle  = -(EndPoint.x() - StartPoint.x()) * avAnale ;
-    float avAnale = M_PI / 180 * 0.6; //把每次移动的角度单位化
-
-        /*把每次移动点跟开始按下鼠标记录的点作差，然后乘以avAngle,最后把上一次释放鼠标后时记录的
-          角度相加起来*/
-    CurrentAngleZ = (EndPoint.x() - StartPoint.x()) * avAnale;
-    CurrentAngleZ += LastAngleZ;
-    CurrentAngleY = (EndPoint.y() - StartPoint.y()) * avAnale;
-    CurrentAngleY += LastAngleY;
-
-
-//    QVector3D vector1(sin(CurrentAngleY) * sin(CurrentAngleZ), cos(CurrentAngleY),
-//                      sin(CurrentAngleY) * cos(CurrentAngleZ));
-    QVector3D vector1(sin(CurrentAngleY) * sin(CurrentAngleZ), cos(CurrentAngleY),
-                      sin(CurrentAngleY) * cos(CurrentAngleZ));
-    vector1 = vector1.normalized();  //将坐标单位化
-    eyex = vector1.x();
-    eyey = vector1.y();
-    eyez = vector1.z();
-
-    /*主要计算第三组坐标*/
-    QVector3D vectorA(0, sin(CurrentAngleY), 0);
-    QVector3D vectorB = - QVector3D(sin(CurrentAngleY) * sin(CurrentAngleZ),
-                                    0, sin(CurrentAngleY) * cos(CurrentAngleZ));
-    QVector3D vectorAB = QVector3D::crossProduct(vectorA, vectorB);
-
-
-    QVector3D vectorC = QVector3D(0, 0, 0)-vector1;
-    QVector3D vector2 = QVector3D::crossProduct(vectorC, vectorAB);
-    vector2 = vector2.normalized();
-    upx = vector2.x();
-    upy = vector2.y();
-    upz = vector2.z();
-}
 
 void renderWindow::drawCoordinate()
 {
-    /*红色轴是X轴，绿色是Y轴，蓝色是Z轴*/
-    glBegin(GL_LINES);
-    glColor3f(1.0f,0.0,0.0);
-    glVertex3f(0.0,0.0,0.0);
-    glVertex3f(0.5,0.0,0.0);
-    glEnd();
-    glPushMatrix();
-    glTranslatef(0.5, 0.0f, 0.0f);
-    glRotatef(90.0f,0.0f,1.0f,0.0f);
-//    glutWireCone(0.027,0.09,10,10);
-    glPopMatrix();
+//    /*红色轴是X轴，绿色是Y轴，蓝色是Z轴*/
+//    glBegin(GL_LINES);
+//    glColor3f(1.0f, 0.0, 0.0);
+//    glVertex3f(0.0,0.0,0.0);
+//    glVertex3f(0.5,0.0,0.0);
+//    glEnd();
+//    glPushMatrix();
+//    glTranslatef(0.5, 0.0f, 0.0f);
+//    glRotatef(90.0f,0.0f,1.0f,0.0f);
 
+////    glutWireCone(0.027,0.09,10,10);
+//    glPopMatrix();
+
+
+//    glBegin(GL_LINES);
+//    glColor3f(0.0,1.0f,0.0);
+//    glVertex3f(0.0,0.0,0.0);
+//    glVertex3f(0.0,0.5,0.0);
+//    glEnd();
+//    glPushMatrix();
+//    glTranslatef(0.0, 0.5f, 0.0f);
+//    glRotatef(-90.0f,1.0f,0.0f,0.0f);
+////    glutWireCone(0.027,0.09,10,10);
+//    glPopMatrix();
+
+
+//    glBegin(GL_LINES);
+//    glColor3f(0.0,0.0,1.0f);
+//    glVertex3f(0.0,0.0,0.0);
+//    glVertex3f(0.0,0.0,0.5);
+//    glEnd();
+//    glPushMatrix();
+//    glTranslatef(0.0, 0.0f, 0.5f);
+////    glutWireCone(0.027, 0.09, 10, 10);
+//    glPopMatrix();
+
+    int length=50;
+    glLineWidth(5);
+    glBegin(GL_LINES);
+    glColor3f(1.0,0.0,0.0);
+    glVertex3f(0.0,0.0,0.0);
+    glVertex3f(length,0.0,0.0);
+    glEnd();
 
     glBegin(GL_LINES);
     glColor3f(0.0,1.0,0.0);
     glVertex3f(0.0,0.0,0.0);
-    glVertex3f(0.0,0.5,0.0);
+    glVertex3f(0.0,length,0.0);
     glEnd();
-    glPushMatrix();
-    glTranslatef(0.0, 0.5f, 0.0f);
-    glRotatef(-90.0f,1.0f,0.0f,0.0f);
-//    glutWireCone(0.027,0.09,10,10);
-    glPopMatrix();
-
 
     glBegin(GL_LINES);
     glColor3f(0.0,0.0,1.0);
     glVertex3f(0.0,0.0,0.0);
-    glVertex3f(0.0,0.0,0.5);
+    glVertex3f(0.0,0.0,length);
     glEnd();
-    glPushMatrix();
-    glTranslatef(0.0, 0.0f, 0.5f);
-//    glutWireCone(0.027, 0.09, 10, 10);
-    glPopMatrix();
+
+    glLineWidth(1);
+    glEnd();
+
 
 }
 
 
 void renderWindow::mousePressEvent(QMouseEvent *event)
 {
-    QPoint st(event->pos());
-    StartPoint = st;
+
+//    qDebug() << "x = " << event->pos().x() << "y = " << event->pos().y();
+//    QPoint st(event->pos());
+//    StartPoint = st;
+    sceneManager->getInitPos(event->x(),event->y());
+
 }
+
+
+void renderWindow::mouseMoveEvent(QMouseEvent *event)
+{
+//    qDebug() << "mouse move to " << event->pos().x();
+//    compareToLastScaleFactor = 1;
+//    QPoint ed(event->pos());
+
+//    GLint viewport[4];
+//    glGetIntegerv(GL_VIEWPORT, viewport);
+//    glm::vec2 newMouse = scaleMouse(glm::vec2(ed.x(), ed.y()),
+//                                    glm::vec2(viewport[2], viewport[3]));
+//    glm::vec2 oldMouse = scaleMouse(glm::vec2(StartPoint.x(), StartPoint.y()),
+//                                    glm::vec2(viewport[2], viewport[3]));
+//    setRotateParameter(newMouse, oldMouse);
+
+//    StartPoint = ed;
+////    EndPoint = ed;
+
+//    this->update();
+//    lastmatrix = matrix;
+    if(event->buttons()&Qt::LeftButton)
+    {
+        if(event->modifiers()==Qt::CTRL)
+        {
+            sceneManager->executeTranslateOperation(event->x(),event->y());
+        }
+        else
+        {
+            sceneManager->executeRotateOperation(event->x(),event->y());
+        }
+    }
+    update();
+
+}
+//    void mouseClickEvent(QMouseEvent *event);
+
+void renderWindow::setRotateParameter(glm::vec2 newMouse, glm::vec2 oldMouse)
+{
+
+//    if(newMouse == oldMouse){
+//        return;
+//    }
+    glm::vec3 p1 = projectToSphere(oldMouse);
+    glm::vec3 p2 = projectToSphere(newMouse);
+    r_axis_world = glm::cross(p1, p2);
+    glm::vec3 d = p1 - p2;
+    rotateAngle = 180 * glm::length(d) ;
+
+};
+
 
 void renderWindow::mouseReleaseEvent(QMouseEvent *event)
 {
-    /*记录上一次的角度*/
 
 
-    LastAngleZ=CurrentAngleZ;
-    LastAngleY=CurrentAngleY;
+    lastmatrix = matrix;
 
 }
 
@@ -246,31 +316,50 @@ void renderWindow::mouseReleaseEvent(QMouseEvent *event)
 
 void renderWindow::wheelEvent(QWheelEvent *event)
 {
+//    rotateAngle = 0;
 
-
-    if (event->delta() >= 0){
-        this->scaleVariable(0.1);
+//    if (event->delta() >= 0)
+//    {
+//        this->scaleVariable(0.1);
+//    }
+//    else
+//    {
+//        this->scaleVariable(- 0.1);
+//    }
+    if(event->delta()>=0)
+    {
+        sceneManager->executeScaleOperation(-0.1);
+    }else
+    {
+        sceneManager->executeScaleOperation(0.1);
     }
-    else{
-        this->scaleVariable(- 0.1);
-    }
+    update();
 }
 
 void renderWindow::scaleVariable(float delta)
 {
-    if(TempscaleFactor >= 0.1)
+    if(compareToOrijinScaleFactor >= 0.1)
     {
 
-        TempscaleFactor += delta;
+        compareToLastScaleFactor = (compareToOrijinScaleFactor + delta) / compareToOrijinScaleFactor;
+        compareToOrijinScaleFactor += delta;
+
     }
     else if(delta > 0)
     {
-        TempscaleFactor += delta;
+
+        compareToLastScaleFactor = (compareToOrijinScaleFactor + delta) / compareToOrijinScaleFactor;
+        compareToOrijinScaleFactor += delta;
+
     }
 //    else{
 //        TempscaleFactor = 0;
 //    }
-    this->repaint();
+
+    this->update();
+    lastmatrix = matrix;
+
+
 };
 
 

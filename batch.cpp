@@ -149,7 +149,6 @@ void Batch::draw()
         qDebug() << "nothing to render!";
         return;
     }
-    glColor4d(1.0, 0, 0, 0);
     extraFunctions->glBindVertexArray( _vao );
     extraFunctions->glDrawArrays( GL_POINTS, 0, 1500 );
     extraFunctions->glBindVertexArray( 0 );

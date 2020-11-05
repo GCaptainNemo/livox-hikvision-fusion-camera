@@ -23,7 +23,7 @@ DeviceItem devices[kMaxLidarCount] = {};
 
 void setLidarThreadObject::setLidarSLOT()
 {
-    qDebug() << "Current Thread ID2: " << QThread::currentThreadId();
+    qDebug() << "Current Thread ID2 in setlidarSLOT: " << QThread::currentThreadId();
 
     if (!Init()) {
         return;
@@ -90,7 +90,7 @@ MainWindow::MainWindow(QWidget *parent)
     long previewID = hikvisionReceive->play(NULL, struPlayInfo, label);
 
 
-    qDebug() << "Current Thread ID: " << QThread::currentThreadId();
+    qDebug() << "main Current Thread ID: " << QThread::currentThreadId();
     setLidarThreadObject * setLidarThreadObj = new setLidarThreadObject();
     QThread * thread = new QThread();
     setLidarThreadObj->moveToThread(thread);
@@ -239,6 +239,7 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
             }
             else
             {
+                qDebug() << "Current Thread ID in getLidarcallback:" << QThread::currentThreadId();
                 MainWindow::replaceThisPointer->renderRgbPCWidget->update();
 //                MainWindow::replaceThisPointer->renderRgbPCWidget->vbo.write(0,
 //                            &MainWindow::vertexPositions, 1500 * 3 * sizeof(float));
@@ -248,6 +249,7 @@ void MainWindow::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t dat
 //                MainWindow::replaceThisPointer->renderRgbPCWidget->update();
 
                 MainWindow::bufferVertexCount = 0;
+                qDebug() << "buffer clean ";
 //                renderWindow::vertexPositions.clear();
 //                renderWindow::vertexReflectivity.clear();
             }
