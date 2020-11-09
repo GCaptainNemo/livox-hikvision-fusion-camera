@@ -1,17 +1,19 @@
 ﻿#ifndef CENTRALWINDOW_H
 #define CENTRALWINDOW_H
 #define GLEW_STATIC
-#include "GL/glew.h"
+//#include "GL/glew.h"
 //#pragma comment(lib, "glew32.lib")
 
 #include <glm/glm.hpp>
 #include <QWidget>
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_3_3_Core>
+
 #include <QOpenGLShader>
 #include <QOpenGLBuffer>
 #include <QOpenGLShaderProgram>
+#include <QOpenGLVertexArrayObject>
 #include <QVector3D>
 #include <QTimer>
 
@@ -29,7 +31,7 @@
 
 
 
-class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions
+class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 {
     Q_OBJECT
 public:
@@ -48,10 +50,19 @@ public:
 
     GLfloat rotateAngle;
     glm::vec3 r_axis_world;
-    QOpenGLBuffer vbo;
-    QOpenGLShaderProgram * program;
+    QOpenGLBuffer vboVertex;
+    QOpenGLBuffer vboCoordinate;
+
+    QOpenGLVertexArrayObject vaoVertex;
+    QOpenGLVertexArrayObject vaoCoordinate;
+
+
+    QOpenGLShaderProgram * vertexShaderProgram;
+    QOpenGLShaderProgram * coordinateShaderProgram;
+
     unsigned int VBOID;
     unsigned int VAOID;
+//    unsigned int vertexShaderProgram;
 
 private:
     RoamingScenceManager * sceneManager;
@@ -76,7 +87,7 @@ public:
     void mouseMoveEvent(QMouseEvent *event);
     void mousePressEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
+//    void mouseReleaseEvent(QMouseEvent *event);
 
 
 

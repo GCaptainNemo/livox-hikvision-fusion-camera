@@ -68,7 +68,7 @@ LIBS += kernel32.lib\
         OpenGL32.Lib\
         GlU32.Lib\
         glut32.lib\
-        D:/glew/glew-2.1.0/lib/Release/glew32s.lib\
+        D:/glew/glew-2.1.0/lib/Release/Win32/glew32s.lib\
         C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
         D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\

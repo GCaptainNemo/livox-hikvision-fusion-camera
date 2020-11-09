@@ -48,16 +48,28 @@ void RoamingScenceManager::init()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LEQUAL);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(-1000/2,1000/2,-1000/2,1000/2,-1000/2,1000/2);
+//    glMatrixMode(GL_PROJECTION);
+//    glLoadIdentity();
+//    glOrtho(-1000/2,1000/2,-1000/2,1000/2,-1000/2,1000/2);
 }
+
+void RoamingScenceManager::calculateMatrix(QMatrix4x4 &matrix)
+{
+    *NewView = *NewEye  * -1;
+    matrix.translate(TempTranslateVec->x(), TempTranslateVec->y(), TempTranslateVec->z());
+    matrix.scale(TempscaleFactor, TempscaleFactor, TempscaleFactor);
+    matrix.lookAt(*NewEye, *NewView, *NewUp);
+
+
+}
+
 
 void RoamingScenceManager::render()
 {
     glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    *NewView = *NewEye  * -1;
+
+
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glTranslatef(TempTranslateVec->x(), TempTranslateVec->y(), TempTranslateVec->z());
@@ -67,6 +79,7 @@ void RoamingScenceManager::render()
               NewUp->x(), NewUp->y(), NewUp->z());
     glColor3f(1,0,0);
 //    glutWireCube(250);
+
     glCallList(ID_COORDINATY);
 
 }

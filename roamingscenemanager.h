@@ -13,6 +13,8 @@ public:
 
     void init();
     void render();
+    void calculateMatrix(QMatrix4x4 &matrix);
+
     void executeRotateOperation(int x, int y);
     void executeScaleOperation(float factor);
     void executeTranslateOperation(int x,int y);
