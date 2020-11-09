@@ -51,12 +51,12 @@ void renderWindow::initializeGL()
     QOpenGLShader *vshader = new QOpenGLShader(QOpenGLShader::Vertex, this);
     const char *vertexshader =
              "#version 330 core                         \n"
-             "layout(location = 0) in vec3 vPosition;   \n"
-             "layout(location = 1) in vec3 vColor;      \n"
+             "in vec4 vPosition;   \n"
+             "in vec4 vColor;      \n"
              "out vec4 color;                           \n"
              "uniform mat4 matrix;                      \n"
              "void main() {                             \n"
-             "   color = vec4(vColor, 1.0);             \n"
+             "   color = vColor;                        \n"
              "   gl_Position = matrix * vPosition;      \n"
              "}                                         \n";
 
@@ -100,7 +100,7 @@ void renderWindow::initializeGL()
     vaoVertex.release();
     vboVertex.release();
     vertexShaderProgram->release();
-    \
+//    \
 
     // ////////////////////////////////////////////////////////////////////////////
     // coordinate render initialize
@@ -126,11 +126,11 @@ void renderWindow::initializeGL()
     vboCoordinate.allocate(coordinatePosColor,
                            12 * 3 * sizeof (GLfloat));
 
-    vaoVertex.create();
-    vaoVertex.bind();
+    vaoCoordinate.create();
+    vaoCoordinate.bind();
 
     GLuint coorPosition = coordinateShaderProgram->attributeLocation("vPosition");
-    coordinateShaderProgram->setAttributeBuffer(vPosition, GL_FLOAT, 0, 3, 0);
+    coordinateShaderProgram->setAttributeBuffer(coorPosition, GL_FLOAT, 0, 3, 0);
     coordinateShaderProgram->enableAttributeArray(coorPosition);
 
     GLuint coorColor = coordinateShaderProgram->attributeLocation("vColor");
@@ -138,7 +138,7 @@ void renderWindow::initializeGL()
     coordinateShaderProgram->enableAttributeArray(coorColor);
 
     qDebug() << "vcolor, vPostion, coorColor, coorPosition = "
-             << vColor << vPosition << coorColor << coorPosition;
+              << coorColor << coorPosition;
 
     vaoCoordinate.release();
     vboCoordinate.release();
@@ -203,35 +203,36 @@ void renderWindow::paintGL()
     glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    // ////////////////////////////////////////////////////////////////////////
+    // calculate modelview matrix
+    // ////////////////////////////////////////////////////////////////////////
+
+    QMatrix4x4 matrix;
+    matrix.ortho(-50, 50, -50, 50, -5000, 5000);
+    sceneManager->calculateMatrix(matrix);
 
     // ////////////////////////////////////////////////////////////////////////
     // positions & color buffer allocate
     // ////////////////////////////////////////////////////////////////////////
-//    vboVertex.bind();
-//    vertexShaderProgram->bind();
-//    vaoVertex.bind();
-//    vboVertex.bind();
-//    vboVertex.write(0,
-//    &renderWindow::vertexPositions, 1500 * 3 * sizeof(GLfloat));
+    vertexShaderProgram->bind();
+    vaoVertex.bind();
+    vboVertex.bind();
+
+    vboVertex.write(0,
+    &renderWindow::vertexPositions, 1500 * 3 * sizeof(GLfloat));
 
 
-//    vboVertex.write(1500 * 3 * sizeof(float),
-//              &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(GLfloat));
+    vboVertex.write(1500 * 3 * sizeof(float),
+              &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(GLfloat));
 //    qDebug() << "allocate finish";
 
-
-//    // ////////////////////////////////////////////////////////////////////////
-//    // calculate modelview matrix
-//    // ////////////////////////////////////////////////////////////////////////
-
-//    QMatrix4x4 matrix;
-//    sceneManager->calculateMatrix(matrix);
-//    vertexShaderProgram->setUniformValue("matrix", matrix);
-//    glDrawArrays(GL_POINTS, 0, 1500);
-
-//    vaoVertex.release();
-//    vertexShaderProgram->release();
-//    vboVertex.release();
+    vertexShaderProgram->bind();
+    vertexShaderProgram->setUniformValue("matrix", matrix);
+    vaoVertex.bind();
+    glDrawArrays(GL_POINTS, 0, 1500);
+    vaoVertex.release();
+    vertexShaderProgram->release();
+    vboVertex.release();
 
 
     // ////////////////////////////////////////////////////////////////////////
@@ -239,13 +240,12 @@ void renderWindow::paintGL()
     // ////////////////////////////////////////////////////////////////////////
 
     coordinateShaderProgram->bind();
-    vaoCoordinate.bind();
     coordinateShaderProgram->setUniformValue("matrix", matrix);
+    vaoCoordinate.bind();
     glDrawArrays(GL_LINES, 0, 6);
     vaoCoordinate.release();
     coordinateShaderProgram->release();
 
-//    drawCoordinate();
 
     // ////////////////////////////////////////////////////////////
 
@@ -336,12 +336,12 @@ void renderWindow::wheelEvent(QWheelEvent *event)
 //    {
 //        this->scaleVariable(- 0.1);
 //    }
-    if(event->delta()>=0)
-    {
-        sceneManager->executeScaleOperation(-0.1);
-    }else
+    if(event->delta() >= 0)
     {
         sceneManager->executeScaleOperation(0.1);
+    }else
+    {
+        sceneManager->executeScaleOperation(-0.1);
     }
-    update();
+    this->update();
 }

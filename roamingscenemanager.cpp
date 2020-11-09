@@ -64,25 +64,25 @@ void RoamingScenceManager::calculateMatrix(QMatrix4x4 &matrix)
 }
 
 
-void RoamingScenceManager::render()
-{
-    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//void RoamingScenceManager::render()
+//{
+//    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    glTranslatef(TempTranslateVec->x(), TempTranslateVec->y(), TempTranslateVec->z());
-    glScalef(TempscaleFactor, TempscaleFactor, TempscaleFactor);
-    gluLookAt(NewEye->x(), NewEye->y(), NewEye->z(),
-              NewView->x(), NewView->y(), NewView->z(),
-              NewUp->x(), NewUp->y(), NewUp->z());
-    glColor3f(1,0,0);
-//    glutWireCube(250);
+//    glMatrixMode(GL_MODELVIEW);
+//    glLoadIdentity();
+//    glTranslatef(TempTranslateVec->x(), TempTranslateVec->y(), TempTranslateVec->z());
+//    glScalef(TempscaleFactor, TempscaleFactor, TempscaleFactor);
+//    gluLookAt(NewEye->x(), NewEye->y(), NewEye->z(),
+//              NewView->x(), NewView->y(), NewView->z(),
+//              NewUp->x(), NewUp->y(), NewUp->z());
+//    glColor3f(1,0,0);
+////    glutWireCube(250);
 
-    glCallList(ID_COORDINATY);
+//    glCallList(ID_COORDINATY);
 
-}
+//}
 
 void RoamingScenceManager::executeRotateOperation(int x, int y)
 {
