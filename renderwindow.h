@@ -37,6 +37,8 @@ class renderWindow : public QOpenGLWidget, protected QOpenGLFunctions_3_3_Core
 public:
     static GLfloat vertexPositions[1500][3];
     static GLfloat vertexReflectivity[1500][3];
+    static GLfloat vertexColor[1500][3];
+    static bool isColor;
 
     float compareToOrijinScaleFactor;
     float compareToLastScaleFactor;

@@ -4,14 +4,21 @@
 #include "livox_sdk.h"
 #include <apr_general.h>
 #include <apr_getopt.h>
-
-
+#include <QDebug>
+#include <QThread>
+#include <QColor>
+#include "renderwindow.h"
+#include "receiverhikvision.h"
+#include "opencv.hpp"
 
 // prepare to fengzhuang livox receive
-class livoxreceiver
+class livoxreceiver:public QObject
 {
+    Q_OBJECT
 public:
     livoxreceiver();
+    ~livoxreceiver();
+
     static void GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t data_num, void *client_data);
     static void OnDeviceBroadcast(const BroadcastDeviceInfo *info);
 
@@ -26,6 +33,18 @@ public:
 
     static void LidarDisConnect(const DeviceInfo *info);
     static void LidarStateChange(const DeviceInfo *info);
+
+signals:
+    void updateRenderWindowSIGNAL();
+
+
+    //
+public:
+    static int lidar_count;
+    static uint32_t data_receive_count; //  uint32_t goes from 0 to 2^32 - 1.
+    static char broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize];  //  32 × 16
+    static int bufferVertexCount;
+    static livoxreceiver * replaceThisLivoxReceiver;
 
 };
 

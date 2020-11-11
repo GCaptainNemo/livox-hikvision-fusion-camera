@@ -5,11 +5,11 @@
 #include <QThread>
 
 
-//int maxNumVertex = 1500;
-
-
 GLfloat renderWindow::vertexPositions[1500][3];
 GLfloat renderWindow::vertexReflectivity[1500][3];
+GLfloat renderWindow::vertexColor[1500][3];
+bool renderWindow::isColor = true;
+
 
 
 renderWindow::renderWindow(QWidget *parent) : QOpenGLWidget(parent)
@@ -39,7 +39,8 @@ void renderWindow::initializeGL()
     this->initializeOpenGLFunctions();
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_CULL_FACE);
-    glClearColor(0.156, 0.156, 0.168, 0.0);
+//    glClearColor(0.156, 0.156, 0.168, 0.0);
+    glClearColor(0, 0, 0, 0.0);
 
 
     // ////////////////////////////////////////////////////////////////////////////
@@ -200,7 +201,13 @@ void renderWindow::resizeGL(int w,int h)
 
 void renderWindow::paintGL()
 {
-    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
+//    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
+    int w = width();
+    int h = height();
+    int side = qMin(w, h);
+    glViewport((w-side) / 2, (h-side) / 2, side, side);
+    glClearColor(0, 0, 0, 0.0);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     // ////////////////////////////////////////////////////////////////////////
@@ -221,11 +228,16 @@ void renderWindow::paintGL()
     vboVertex.write(0,
     &renderWindow::vertexPositions, 1500 * 3 * sizeof(GLfloat));
 
-
-    vboVertex.write(1500 * 3 * sizeof(float),
+    if(!renderWindow::isColor)
+    {
+        vboVertex.write(1500 * 3 * sizeof(float),
               &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(GLfloat));
-//    qDebug() << "allocate finish";
+    }
+    else{
+        vboVertex.write(1500 * 3 * sizeof(float),
+              &renderWindow::vertexReflectivity, 1500 * 3 * sizeof(GLfloat));
 
+    }
     vertexShaderProgram->bind();
     vertexShaderProgram->setUniformValue("matrix", matrix);
     vaoVertex.bind();

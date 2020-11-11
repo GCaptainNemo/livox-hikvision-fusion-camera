@@ -2,6 +2,8 @@
 
 long nPort;
 QLabel * hikvisionReceiver::displayLabel = nullptr;
+QImage hikvisionReceiver::img = {};
+int hikvisionReceiver::count = 0;
 
 hikvisionReceiver::hikvisionReceiver()
 {
@@ -32,6 +34,8 @@ hikvisionReceiver::hikvisionReceiver()
     }
     qDebug() << userID;
 }
+
+
 
 
 long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo, QLabel * label)
@@ -67,16 +71,44 @@ void CALLBACK hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, F
 
     if (lFrameType == T_YV12)
     {
-        cv::Mat pImg(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3);
-        cv::Mat src(pFrameInfo->nHeight + pFrameInfo->nHeight / 2, pFrameInfo->nWidth, CV_8UC1, pBuf);
+        // width =  1920 Height =  1080
+        cv::Mat destImg(pFrameInfo->nHeight, pFrameInfo->nWidth, CV_8UC3);
 
-        cv::cvtColor(src, pImg, cv::COLOR_YUV420p2RGB);
-        QImage Img = QImage((const uchar * )(pImg.data), pImg.cols, pImg.rows, pImg.cols * pImg.channels(), QImage::Format_RGB888);
-        hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(Img));
+        cv::Mat YUVimage(pFrameInfo->nHeight + pFrameInfo->nHeight / 2,
+                    pFrameInfo->nWidth, CV_8UC1, pBuf);
+
+        cv::cvtColor(YUVimage, destImg, cv::COLOR_YUV420p2RGB);
+//        hikvisionReceiver::img = QImage((const uchar * )(destImg.data), destImg.cols, destImg.rows, destImg.cols * destImg.channels(), QImage::Format_RGB888);
+
+        QImage img = QImage((const uchar * )(destImg.data), destImg.cols, destImg.rows, destImg.cols * destImg.channels(), QImage::Format_RGB888);
+        if (hikvisionReceiver::count == 0)
+        {
+            hikvisionReceiver::img = img;
+            hikvisionReceiver::count += 1;
+        }
+//        hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(hikvisionReceiver::img));
+        hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(img));
         hikvisionReceiver::displayLabel->setMaximumWidth(700);
     }
 }
 
+QColor hikvisionReceiver::getColor(const cv::Mat &pos)
+{
+//    qDebug() << "in getColr";
+//    cv::projectPoints(pos, )
+
+    cv::Mat newPos = frontEndInfo::transfromPar * pos;
+    int x = (int) (newPos.at<float>(0) / newPos.at<float>(2));
+    int y = (int) (newPos.at<float>(1) / newPos.at<float>(2));
+    qDebug() << "x = " << x << "y = " << y;
+    QColor a;
+    if ( 0<=x <= 192 && 0<= y <= 108 && hikvisionReceiver::img.size().width())
+    {
+        return hikvisionReceiver::img.pixelColor(x, y);
+    }
+    return QColor(0.0, 0, 0, 1);
+
+}
 
 void CALLBACK hikvisionReceiver::fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser)
 {
@@ -150,6 +182,7 @@ void CALLBACK hikvisionReceiver::fRealDataCallBack(LONG lRealHandle, DWORD dwDat
 }
 
 
-hikvisionReceiver::~hikvisionReceiver(){
+hikvisionReceiver::~hikvisionReceiver()
+{
 
 }

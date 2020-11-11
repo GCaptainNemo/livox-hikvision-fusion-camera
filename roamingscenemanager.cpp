@@ -1,7 +1,7 @@
 ﻿#include "roamingscenemanager.h"
 
-#include"gl/glew.h"
-#include"GL/glut.h"
+#include "gl/glew.h"
+#include "GL/glut.h"
 
 RoamingScenceManager::RoamingScenceManager()
 {
@@ -21,8 +21,6 @@ RoamingScenceManager::RoamingScenceManager()
 
     TempTranslateVec = new QVector3D(0, 0, 0);
     TempscaleFactor = 1;
-
-
 }
 
 RoamingScenceManager::~RoamingScenceManager()
@@ -42,7 +40,9 @@ void RoamingScenceManager::init()
 {
     init_CoordinaryDisplayList();
     glShadeModel(GL_SMOOTH);
-    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
+//    glClearColor(0.156, 0.156, 0.168, 0.0);
+    glClearColor(0, 0, 0, 0.0);
+
     glClearDepth(1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
@@ -56,7 +56,7 @@ void RoamingScenceManager::init()
 void RoamingScenceManager::calculateMatrix(QMatrix4x4 &matrix)
 {
     *NewView = *NewEye  * -1;
-    matrix.translate(TempTranslateVec->x(), TempTranslateVec->y(), TempTranslateVec->z());
+    matrix.translate(TempTranslateVec->x() / 5, TempTranslateVec->y() / 5, TempTranslateVec->z() / 5);
     matrix.scale(TempscaleFactor, TempscaleFactor, TempscaleFactor);
     matrix.lookAt(*NewEye, *NewView, *NewUp);
 
