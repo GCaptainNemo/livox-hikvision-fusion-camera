@@ -57,13 +57,11 @@ public:
     ~MainWindow();
 
     renderWindow * renderRgbPCWidget;
-    hikvisionReceiver * hikvisionReceive;
-    livoxreceiver * livoxReceive;
+    hikvisionReceiver * hikvisionReceiveOBJ;
+    livoxreceiver * livoxReceiveOBJ;
 
 public:
 
-    static uint32_t data_receive_count; //  uint32_t goes from 0 to 2^32 - 1.
-    static char broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize];  //  32 × 16
     setLidarThreadObject * setlidar_thread;
 
 signals:

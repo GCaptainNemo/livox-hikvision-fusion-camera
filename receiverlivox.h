@@ -45,6 +45,8 @@ public:
     static char broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize];  //  32 × 16
     static int bufferVertexCount;
     static livoxreceiver * replaceThisLivoxReceiver;
+    static void getColor(const cv::Mat &pos, QColor& color);
+
 
 };
 

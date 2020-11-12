@@ -16,7 +16,7 @@ typedef struct {
 int livoxreceiver::lidar_count = 1;
 uint32_t livoxreceiver::data_receive_count = 0;
 int livoxreceiver::bufferVertexCount = 0;
-
+extern QImage _img_;
 char livoxreceiver::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
 };
@@ -133,6 +133,7 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
         }
         else if ( data ->data_type == kExtendCartesian)
         {
+//            if(livoxreceiver::data_receive_count % 3){
             if (livoxreceiver::bufferVertexCount < 1500)
             {
 
@@ -143,28 +144,36 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
                 // reflectivity and color two mode
                 if(renderWindow::isColor)
                 {
-                    double a[4];
+                    float a[3];
                     a[0] = p_point_data->x;
                     a[1] = p_point_data->y;
                     a[2] = p_point_data->z;
-                    a[3] = 1.0;
-                    cv::Mat pos(4, 1, CV_32FC1, a);
-                    QColor rgb = hikvisionReceiver::getColor(pos);
+
+                    cv::Mat pos(3, 1, CV_32FC1, a);
+                    QColor rgb;
+                    livoxreceiver::getColor(pos, rgb);
                     renderWindow::vertexColor[livoxreceiver::bufferVertexCount][0] = GLfloat(rgb.red()) / 255;
                     renderWindow::vertexColor[livoxreceiver::bufferVertexCount][1] = GLfloat(rgb.green()) / 255;
                     renderWindow::vertexColor[livoxreceiver::bufferVertexCount][2] = GLfloat(rgb.blue()) / 255;
 
                 }
                 else{
-                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][0] = GLfloat(p_point_data->reflectivity) / 255;
-                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][1] = GLfloat(p_point_data->reflectivity) / 255;
-                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][2] = GLfloat(p_point_data->reflectivity) / 255;
+//                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][0] =
+//                            GLfloat(p_point_data->reflectivity) / 255;
+//                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][1] =
+//                            GLfloat(p_point_data->reflectivity) / 255;
+//                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][2] =
+//                            GLfloat(p_point_data->reflectivity) / 255;
+                    // pseudo color.
+                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][0] =
+                        abs(255 - GLfloat(p_point_data->reflectivity)) / 255;
+                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][1] =
+                        abs(127 - GLfloat(p_point_data->reflectivity)) / 255;
+                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][2] =
+                        GLfloat(p_point_data->reflectivity) / 255;
 
                 }
                 livoxreceiver::bufferVertexCount += 1;
-                //                qDebug() << p_point_data->reflectivity;
-                //
-//                renderWindow::vertices_positions << QVector3D(p_point_data->x , p_point_data->y, p_point_data->z);
 
             }
             else
@@ -172,9 +181,12 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
                 qDebug() << "Current Thread ID in getLidarcallback:" << QThread::currentThreadId();
 //                MainWindow::replaceThisPointer->renderRgbPCWidget->update();
                 livoxreceiver::bufferVertexCount = 0;
-                livoxreceiver::replaceThisLivoxReceiver->updateRenderWindowSIGNAL(); //
+                emit livoxreceiver::replaceThisLivoxReceiver->updateRenderWindowSIGNAL(); //
                 qDebug() << "buffer clean ";
             }
+//            }
+//            livoxreceiver::data_receive_count += 1;
+
         }
         else if ( data ->data_type == kExtendSpherical)
         {
@@ -195,6 +207,41 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
 }
 }
 
+void livoxreceiver::getColor(const cv::Mat &pos, QColor& color)
+{
+//    qDebug() << "in getColr";
+
+    std::vector<cv::Point2f> projectedPoints;
+
+    cv::projectPoints(pos,
+                      frontEndInfo::rotateVector,
+                      frontEndInfo::translatevector,
+                      frontEndInfo::intrinsticMat,
+                      frontEndInfo::distVector, projectedPoints);
+
+//    int x = (int) projectedPoints[0].x;
+//    int y = (int) projectedPoints[0].y;
+    int x = 0;
+    int y = 0;
+
+//    QColor a;
+    color =  QColor(0.0, 0.0, 0.0);
+    return;
+
+    if (!_img_.isNull() && 0<=x && x < 1920 && 0<= y && y< 1080 )
+    {
+//        hikvisionReceiver::lock.lockForRead();
+        color = _img_.pixelColor(1919, 1079);
+        qDebug() << "color.red = " << color.red();
+        return;
+//        hikvisionReceiver::lock.unlock();
+//        qDebug() << "r = " << a.red();
+//        return a;
+    }
+    else{
+        color =  QColor(0.0, 0.0, 0.0);
+    }
+}
 
 
 // 静态函数，Lidar有错误状态时的动作函数

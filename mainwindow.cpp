@@ -1,16 +1,6 @@
 ﻿#include "mainwindow.h"
 //#include "frontendinfo.h"
 
-
-
-
-char MainWindow::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
-    "1HDDH1200105361"
-};
-
-
-
-
 void setLidarThreadObject::setLidarSLOT()
 {
     qDebug() << "Current Thread ID2 in setlidarSLOT: " << QThread::currentThreadId();
@@ -51,12 +41,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
 
     // test
-    frontEndInfo a;
+    frontEndInfo::calculateRotateTranslateVector();
 
 
     this->setAttribute(Qt::WA_DeleteOnClose);
     centralWidget = new QWidget(this);
-    centralHLayout = new QHBoxLayout();
+    centralHLayout = new QHBoxLayout(centralWidget);
     label = new QLabel(centralWidget);
     hsplitter = new QSplitter(Qt::Horizontal, this);
     renderRgbPCWidget = new renderWindow(centralWidget);
@@ -71,20 +61,20 @@ MainWindow::MainWindow(QWidget *parent)
     // ////////////////////////////////////////////////////////////////////////////
 
 
-    hikvisionReceive = new hikvisionReceiver();
+    hikvisionReceiveOBJ = new hikvisionReceiver();
 
 
     NET_DVR_PREVIEWINFO struPlayInfo;
 //    HWND hwnd = (HWND)this->label->winId();
 //    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);
-    long previewID = hikvisionReceive->play(NULL, struPlayInfo, label);
+    long previewID = hikvisionReceiveOBJ->play(NULL, struPlayInfo, label);
 
     // ///////////////////////////////////////////////////////////////
     // livox point cloud receive
     // ///////////////////////////////////////////////////////////////
 
-    livoxReceive = new livoxreceiver();
-    connect(livoxReceive, SIGNAL(updateRenderWindowSIGNAL()), renderRgbPCWidget, SLOT(update()));
+    livoxReceiveOBJ = new livoxreceiver();
+    connect(livoxReceiveOBJ, SIGNAL(updateRenderWindowSIGNAL()), renderRgbPCWidget, SLOT(update()));
     qDebug() << "main Current Thread ID: " << QThread::currentThreadId();
     setLidarThreadObject * setLidarThreadObj = new setLidarThreadObject();
     QThread * thread = new QThread();
@@ -94,13 +84,15 @@ MainWindow::MainWindow(QWidget *parent)
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()) );
 
     thread->start();
-    emit setLidarSIGNAL();
+    emit this->setLidarSIGNAL();
 }
 
 
 
 MainWindow::~MainWindow()
 {
+    delete livoxReceiveOBJ;
+    delete hikvisionReceiveOBJ;
 
 }
 

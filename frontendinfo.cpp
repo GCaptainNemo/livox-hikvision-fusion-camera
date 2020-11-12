@@ -7,7 +7,12 @@ float EXPAR[3][4] = {
 {-5.6563726879350074e-03, -9.9995916778506633e-01, -7.0475677089644195e-03, 7.4506714940071106e-02}
 };
 
-
+float DIST[5] =
+{
+    4.9811000000000001e-02, -2.7529999999999998e-03,
+    -2.2499999999999998e-03, 3.9249999999999997e-03,
+    0.
+};
 
 float INPAR[3][3] = {
     {1.6634617699999999e+03, 0., 9.7235897999999997e+02},
@@ -15,15 +20,16 @@ float INPAR[3][3] = {
     {0., 0., 1.}
 };
 
+
 cv::Mat frontEndInfo::rotateVector(3, 3, CV_32FC1);
-cv::Mat frontEndInfo::translatevector(3, 3, CV_32FC1);
+cv::Mat frontEndInfo::translatevector(3, 1, CV_32FC1);
 
-cv::Mat frontEndInfo::livoxExtrinsticPar(3, 4, CV_32FC1, EXPAR);
+cv::Mat frontEndInfo::extrinsticMat(3, 4, CV_32FC1, EXPAR);
 
-
-cv::Mat frontEndInfo::hikvisionIntrinsticPar(3, 3, CV_32FC1, INPAR);
-cv::Mat frontEndInfo::transfromPar(
-        frontEndInfo::hikvisionIntrinsticPar * frontEndInfo::livoxExtrinsticPar);
+cv::Mat frontEndInfo::intrinsticMat(3, 3, CV_32FC1, INPAR);
+cv::Mat frontEndInfo::distVector(5, 1, CV_32FC1, DIST);
+cv::Mat frontEndInfo::transfromMat(
+        frontEndInfo::intrinsticMat * frontEndInfo::extrinsticMat);
 
 
 
@@ -36,28 +42,27 @@ frontEndInfo::frontEndInfo()
 //    qDebug() << "newPos width = " << newPos.size().width;
 //    qDebug() << "newPos = " << newPos.at<float>(1);
 
-
 }
 
 void frontEndInfo::setExtrinsticPar(float expr[12]){
-    frontEndInfo::livoxExtrinsticPar = cv::Mat(3, 4, CV_32FC1, expr);
+    frontEndInfo::extrinsticMat = cv::Mat(3, 4, CV_32FC1, expr);
 };
 
 void frontEndInfo::setIntrinsticPar(float inpr[9]){
-    frontEndInfo::hikvisionIntrinsticPar = cv::Mat(3, 3, CV_32FC1, inpr);
+    frontEndInfo::intrinsticMat = cv::Mat(3, 3, CV_32FC1, inpr);
 };
 
 void frontEndInfo::calculateTransfromPar()
 {
-    frontEndInfo::transfromPar = frontEndInfo::hikvisionIntrinsticPar * frontEndInfo::livoxExtrinsticPar;
+    frontEndInfo::transfromMat = frontEndInfo::intrinsticMat * frontEndInfo::extrinsticMat;
 }
 
 void frontEndInfo::calculateRotateTranslateVector()
 {
-    cv::Mat rotateMatrix = frontEndInfo::livoxExtrinsticPar(cv::Rect(0, 0, 3, 3));
-//    cv::Mat rotateVector(3, 1, CV_32FC1);
+    cv::Mat rotateMatrix = frontEndInfo::extrinsticMat(cv::Rect(0, 0, 3, 3));
     cv::Rodrigues(rotateMatrix, frontEndInfo::rotateVector);
-//    return rotateVector;
-    frontEndInfo::translatevector = frontEndInfo::livoxExtrinsticPar(cv::Rect(0, 2, 1, 3));
+    // Rect
+    frontEndInfo::translatevector = frontEndInfo::extrinsticMat(cv::Rect(3, 0, 1, 3));
+    qDebug() << "has been calculated";
 }
 
