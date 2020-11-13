@@ -278,6 +278,8 @@ void livoxreceiver::getColor(const cv::Mat &pos, QColor& color)
         color = _img_.pixelColor(x, y);
 
 //        hikvisionReceiver::lock.unlock();
+        qDebug() << "color.red = " << color.red();
+//          hikvisionReceiver::lock.unlock();
 //        qDebug() << "r = " << a.red();
 //        return a;
     }

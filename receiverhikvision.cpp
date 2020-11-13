@@ -115,6 +115,7 @@ void hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO
         if (_img_.isNull())
         {
             qDebug() << "is Null";
+
             _img_= img.copy();
             // 此时已是RGB格式
 //            _img_mat_ = cv::Mat(_img_.height(), _img_.width(), CV_8UC3,
