@@ -62,8 +62,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     hikvisionReceiveOBJ = new hikvisionReceiver();
-
-
     NET_DVR_PREVIEWINFO struPlayInfo;
 //    HWND hwnd = (HWND)this->label->winId();
 //    long previewID = hikvisionReceive->play(hwnd,struPlayInfo);

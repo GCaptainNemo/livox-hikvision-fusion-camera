@@ -4,6 +4,8 @@ long nPort;
 QLabel * hikvisionReceiver::displayLabel = nullptr;
 QReadWriteLock hikvisionReceiver::lock;
 QImage _img_;
+cv::Mat _img_mat_;
+std::vector<std::vector<float>> color_vector;
 int hikvisionReceiver::count = 0;
 
 hikvisionReceiver::hikvisionReceiver()
@@ -37,7 +39,33 @@ hikvisionReceiver::hikvisionReceiver()
 }
 
 
+void hikvisionReceiver::correctDistortion()
+{
+    // 注意这里并没有用cv::projectPoints直接在图像上投影得到U,V因为，调用这个API本身也要先矫正图像,这样更快。
+        // use intrinsic matrix and distortion matrix to correct the photo first
+    cv::Mat view, rview, map1, map2;
+    cv::Size imageSize = _img_mat_.size();
+    cv::initUndistortRectifyMap(frontEndInfo::intrinsticMat, frontEndInfo::distortionMatrix, cv::Mat(),
+        cv::getOptimalNewCameraMatrix(frontEndInfo::intrinsticMat, frontEndInfo::distortionMatrix, imageSize, 1, imageSize, 0),
+        imageSize, CV_16SC2, map1, map2);
+    cv::remap(_img_mat_, _img_mat_, map1, map2, cv::INTER_LINEAR);  // correct the distortion
+    int row = _img_mat_.rows;
+    int col = _img_mat_.cols;
 
+    color_vector.resize(row * col);
+    for (unsigned int i = 0; i < color_vector.size(); ++i) {
+        color_vector[i].resize(3);
+    }
+    for (int v = 0; v < row; ++v) {
+        int a = v*col;
+        for (int u = 0; u < col; ++u) {
+            // for .bmp photo, the 3 channels are BGR
+            color_vector[a + u][0] = float(_img_mat_.at<cv::Vec3b>(v, u)[0]) / 255;
+            color_vector[a + u][1] = float(_img_mat_.at<cv::Vec3b>(v, u)[1]) / 255;
+            color_vector[a + u][2] = float(_img_mat_.at<cv::Vec3b>(v, u)[2]) / 255;
+        }
+    }
+}
 
 long hikvisionReceiver::play(HWND hWnd, NET_DVR_PREVIEWINFO struPlayInfo, QLabel * label)
 {
@@ -81,54 +109,26 @@ void hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO
         cv::cvtColor(YUVimage, destImg, cv::COLOR_YUV420p2RGB);
 //        hikvisionReceiver::img = QImage((const uchar * )(destImg.data), destImg.cols, destImg.rows, destImg.cols * destImg.channels(), QImage::Format_RGB888);
 
-        QImage img = QImage((const uchar * )(destImg.data), destImg.cols, destImg.rows, destImg.cols * destImg.channels(), QImage::Format_RGB888);
+        QImage img = QImage((const uchar * )(destImg.data), destImg.cols, destImg.rows, destImg.cols * destImg.channels(),
+                            QImage::Format_RGB888);
 //        if (hikvisionReceiver::count == 0)
         if (_img_.isNull())
         {
             qDebug() << "is Null";
-//            hikvisionReceiver::lock.lockForWrite();
-            _img_= img;
-//            hikvisionReceiver::lock.unlock();
-//            hikvisionReceiver::count = 1;
+            _img_= img.copy();
+            // 此时已是RGB格式
+//            _img_mat_ = cv::Mat(_img_.height(), _img_.width(), CV_8UC3,
+//                                (void*)_img_.constBits(), _img_.bytesPerLine()).clone();
+            _img_mat_ = destImg.clone();
+            hikvisionReceiver::correctDistortion();
+
+
         }
-//        hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(hikvisionReceiver::img));
         hikvisionReceiver::displayLabel->setPixmap(QPixmap::fromImage(img));
         hikvisionReceiver::displayLabel->setMaximumWidth(700);
     }
 }
 
-void hikvisionReceiver::getColor(const cv::Mat &pos, QColor& color)
-{
-//    qDebug() << "in getColr";
-
-    std::vector<cv::Point2f> projectedPoints;
-
-    cv::projectPoints(pos,
-                      frontEndInfo::rotateVector,
-                      frontEndInfo::translatevector,
-                      frontEndInfo::intrinsticMat,
-                      frontEndInfo::distVector, projectedPoints);
-
-//    int x = (int) projectedPoints[0].x;
-//    int y = (int) projectedPoints[0].y;
-    int x = 0;
-    int y = 0;
-
-//    QColor a;
-
-    if (!_img_.isNull() && 0<=x && x < 1920 && 0<= y && y< 1080 )
-    {
-//        hikvisionReceiver::lock.lockForRead();
-        color = _img_.pixelColor(1919, 1079);
-        qDebug() << "color.red = " << color.red();
-//        hikvisionReceiver::lock.unlock();
-//        qDebug() << "r = " << a.red();
-//        return a;
-    }
-    else{
-        color =  QColor(0.0, 0.0, 0.0);
-    }
-}
 
 void hikvisionReceiver::fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser)
 {

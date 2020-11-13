@@ -16,9 +16,9 @@ public:
     static cv::Mat transfromMat;
     static cv::Mat rotateVector;
     static cv::Mat translatevector;
-    static cv::Mat distVector;
-    void setExtrinsticPar(float expr[12]);
-    void setIntrinsticPar(float inpr[9]);
+    static cv::Mat distortionMatrix;
+    void setExtrinsticPar(double * expr);
+    void setIntrinsticPar(double * inpr);
     void calculateTransfromPar();
     static void calculateRotateTranslateVector();
 

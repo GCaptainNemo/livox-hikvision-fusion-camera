@@ -30,11 +30,13 @@ public:
     static void fRealDataCallBack(LONG lRealHandle, DWORD dwDataType, BYTE *pBuffer, DWORD dwBufSize, void *pUser);
     static void DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO * pFrameInfo, long nReserved1, long nReserved2);
 
-    static void getColor(const cv::Mat &pos, QColor& color);
     static QLabel * displayLabel;
 //    static QImage img;
     static int count;
     static QReadWriteLock lock;
+    static void correctDistortion();
+
+
 
 };
 

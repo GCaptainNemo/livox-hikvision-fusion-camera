@@ -46,6 +46,13 @@ public:
     static int bufferVertexCount;
     static livoxreceiver * replaceThisLivoxReceiver;
     static void getColor(const cv::Mat &pos, QColor& color);
+    static void getUV(const cv::Mat &matrix_in, const cv::Mat &matrix_out,
+                      const float &x, const float &y, const float &z, float* UV);
+    static void getColor(const cv::Mat &matrix_in, const cv::Mat &matrix_out,
+                         const float &x, const float &y, const float &z,
+                         int row, int col,
+                         float* RGB);
+
 
 
 };

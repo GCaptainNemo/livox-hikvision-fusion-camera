@@ -8,7 +8,7 @@
 GLfloat renderWindow::vertexPositions[1500][3];
 GLfloat renderWindow::vertexReflectivity[1500][3];
 GLfloat renderWindow::vertexColor[1500][3];
-bool renderWindow::isColor = false;
+bool renderWindow::isColor = true;
 
 
 

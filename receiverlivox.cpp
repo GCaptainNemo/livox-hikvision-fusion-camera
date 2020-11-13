@@ -17,6 +17,10 @@ int livoxreceiver::lidar_count = 1;
 uint32_t livoxreceiver::data_receive_count = 0;
 int livoxreceiver::bufferVertexCount = 0;
 extern QImage _img_;
+extern cv::Mat _img_mat_;
+extern std::vector<std::vector<GLfloat>> color_vector;
+
+
 char livoxreceiver::broadcast_code_list[kMaxLidarCount][kBroadcastCodeSize] = {
     "1HDDH1200105361"
 };
@@ -133,7 +137,6 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
         }
         else if ( data ->data_type == kExtendCartesian)
         {
-//            if(livoxreceiver::data_receive_count % 3){
             if (livoxreceiver::bufferVertexCount < 1500)
             {
 
@@ -144,21 +147,21 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
                 // reflectivity and color two mode
                 if(renderWindow::isColor)
                 {
-                    float a[3];
-                    a[0] = p_point_data->x;
-                    a[1] = p_point_data->y;
-                    a[2] = p_point_data->z;
-
-                    cv::Mat pos(3, 1, CV_32FC1, a);
-                    QColor rgb;
-                    livoxreceiver::getColor(pos, rgb);
-                    renderWindow::vertexColor[livoxreceiver::bufferVertexCount][0] = GLfloat(rgb.red()) / 255;
-                    renderWindow::vertexColor[livoxreceiver::bufferVertexCount][1] = GLfloat(rgb.green()) / 255;
-                    renderWindow::vertexColor[livoxreceiver::bufferVertexCount][2] = GLfloat(rgb.blue()) / 255;
-
+                    float rgb[3] = {0.0, 0.0, 0.0};
+                    livoxreceiver::getColor(frontEndInfo::intrinsticMat, frontEndInfo::extrinsticMat,
+                                            p_point_data->x, p_point_data->y, p_point_data->z, _img_mat_.rows, _img_mat_.cols,
+                                            rgb);
+                    if (rgb[0] < 0.003922 && rgb[1] < 0.003922 && rgb[2] < 0.003922) {
+                        livoxreceiver::bufferVertexCount -= 1;
+                    }
+                    else{
+                        renderWindow::vertexColor[livoxreceiver::bufferVertexCount][0] = rgb[0];
+                        renderWindow::vertexColor[livoxreceiver::bufferVertexCount][1] = rgb[1];
+                        renderWindow::vertexColor[livoxreceiver::bufferVertexCount][2] = rgb[2];
+                    }
                 }
                 else{
-//                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][0] =
+//                    renderWindow::vertexReflectivity[livoxreicever::bufferVertexCount][0] =
 //                            GLfloat(p_point_data->reflectivity) / 255;
 //                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][1] =
 //                            GLfloat(p_point_data->reflectivity) / 255;
@@ -184,8 +187,6 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
                 emit livoxreceiver::replaceThisLivoxReceiver->updateRenderWindowSIGNAL(); //
                 qDebug() << "buffer clean ";
             }
-//            }
-//            livoxreceiver::data_receive_count += 1;
 
         }
         else if ( data ->data_type == kExtendSpherical)
@@ -207,6 +208,49 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
 }
 }
 
+// use extrinsic and intrinsic to get the corresponding U and V
+void livoxreceiver::getUV(const cv::Mat &matrix_in, const cv::Mat &matrix_out,
+                          const float &x, const float &y, const float &z,
+                          float* UV)
+{
+    double pos[4][1] = {x, y, z, 1};
+    cv::Mat coordinate(4, 1, CV_64F, pos);
+
+    // calculate the result of u and v
+//    cv::Mat result = matrix_in * matrix_out * coordinate;
+    cv::Mat result = frontEndInfo::transfromMat * coordinate;
+
+
+    float u = result.at<double>(0, 0);
+    float v = result.at<double>(1, 0);
+    float depth = result.at<double>(2, 0);
+    UV[0] = u / depth;
+    UV[1] = v / depth;
+
+}
+
+// get RGB value of the lidar point
+void livoxreceiver::getColor(const cv::Mat &matrix_in, const cv::Mat &matrix_out,
+                             const float &x, const float &y, const float &z,
+                             int row, int col,
+                             float* RGB) {
+    float UV[2] = {0, 0};
+    livoxreceiver::getUV(matrix_in, matrix_out, x, y, z, UV);  // get U and V from the x,y,z
+
+    int u = int(UV[0]);
+    int v = int(UV[1]);
+
+    int32_t index = v*col + u;
+    if (index < row*col && index >= 0) {
+        RGB[0] = color_vector[index][0];
+        RGB[1] = color_vector[index][1];
+        RGB[2] = color_vector[index][2];
+    }
+}
+
+
+
+
 void livoxreceiver::getColor(const cv::Mat &pos, QColor& color)
 {
 //    qDebug() << "in getColr";
@@ -217,23 +261,22 @@ void livoxreceiver::getColor(const cv::Mat &pos, QColor& color)
                       frontEndInfo::rotateVector,
                       frontEndInfo::translatevector,
                       frontEndInfo::intrinsticMat,
-                      frontEndInfo::distVector, projectedPoints);
+                      frontEndInfo::distortionMatrix, projectedPoints);
 
-//    int x = (int) projectedPoints[0].x;
-//    int y = (int) projectedPoints[0].y;
-    int x = 0;
-    int y = 0;
+    int x = (int) projectedPoints[0].x;
+    int y = (int) projectedPoints[0].y;
+//    int x = 0;
+//    int y = 0;
 
 //    QColor a;
-    color =  QColor(0.0, 0.0, 0.0);
-    return;
+//    color =  QColor(0.0, 0.0, 0.0);
+//    return;
 
     if (!_img_.isNull() && 0<=x && x < 1920 && 0<= y && y< 1080 )
     {
 //        hikvisionReceiver::lock.lockForRead();
-        color = _img_.pixelColor(1919, 1079);
-        qDebug() << "color.red = " << color.red();
-        return;
+        color = _img_.pixelColor(x, y);
+
 //        hikvisionReceiver::lock.unlock();
 //        qDebug() << "r = " << a.red();
 //        return a;
@@ -327,6 +370,7 @@ void livoxreceiver::LidarStateChange(const DeviceInfo *info) {
   uint8_t handle = info->handle;
   devices[handle].info = *info;
 }
+
 
 livoxreceiver::~livoxreceiver()
 {

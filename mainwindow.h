@@ -20,19 +20,6 @@
 #include "receiverhikvision.h"
 #include "receiverlivox.h"
 
-//typedef enum {
-//  kDeviceStateDisconnect = 0,
-//  kDeviceStateConnect = 1,
-//  kDeviceStateSampling = 2,
-//} DeviceState;
-
-//typedef struct {
-//  uint8_t handle;
-//  DeviceState device_state;
-//  DeviceInfo info;
-//} DeviceItem;
-
-
 
 class setLidarThreadObject: public QObject
 {
@@ -73,7 +60,6 @@ protected:
     QHBoxLayout * centralHLayout;
     QLabel * label;
     QSplitter * hsplitter;
-
 
 
 };
