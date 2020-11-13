@@ -87,7 +87,7 @@ void hikvisionReceiver::DecCBFun(long nPort, char * pBuf, long nSize, FRAME_INFO
         {
             qDebug() << "is Null";
 //            hikvisionReceiver::lock.lockForWrite();
-            _img_= img;
+            _img_= img.copy();   // deep copy
 //            hikvisionReceiver::lock.unlock();
 //            hikvisionReceiver::count = 1;
         }

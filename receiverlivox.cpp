@@ -219,22 +219,16 @@ void livoxreceiver::getColor(const cv::Mat &pos, QColor& color)
                       frontEndInfo::intrinsticMat,
                       frontEndInfo::distVector, projectedPoints);
 
-//    int x = (int) projectedPoints[0].x;
-//    int y = (int) projectedPoints[0].y;
-    int x = 0;
-    int y = 0;
+    int x = (int) projectedPoints[0].x;
+    int y = (int) projectedPoints[0].y;
 
-//    QColor a;
-    color =  QColor(0.0, 0.0, 0.0);
-    return;
 
     if (!_img_.isNull() && 0<=x && x < 1920 && 0<= y && y< 1080 )
     {
 //        hikvisionReceiver::lock.lockForRead();
-        color = _img_.pixelColor(1919, 1079);
+        color = _img_.pixelColor(x, y);
         qDebug() << "color.red = " << color.red();
-        return;
-//        hikvisionReceiver::lock.unlock();
+//          hikvisionReceiver::lock.unlock();
 //        qDebug() << "r = " << a.red();
 //        return a;
     }
