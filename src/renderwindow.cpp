@@ -201,6 +201,7 @@ void renderWindow::resizeGL(int w,int h)
 
 void renderWindow::paintGL()
 {
+    qDebug() << "in paintGL";
 //    glClearColor(0.156   ,   0.156  ,    0.168 ,     0.0);
     int w = width();
     int h = height();

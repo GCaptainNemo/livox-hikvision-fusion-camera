@@ -6,6 +6,7 @@
 #include <opencv.hpp>
 #include <QDebug>
 // to save camera intrinstic / extrinstic matrix parameter
+void set_calib();
 class frontEndInfo
 {
 public:
@@ -17,6 +18,7 @@ public:
     static cv::Mat rotateVector;
     static cv::Mat translatevector;
     static cv::Mat distortionMatrix;
+//    void set_calib();
     void setExtrinsticPar(double * expr);
     void setIntrinsticPar(double * inpr);
     void calculateTransfromPar();

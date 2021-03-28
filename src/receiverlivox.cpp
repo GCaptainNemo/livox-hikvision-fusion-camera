@@ -137,9 +137,8 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
         }
         else if ( data ->data_type == kExtendCartesian)
         {
-            if (livoxreceiver::bufferVertexCount < 1500)
+            if (livoxreceiver::bufferVertexCount < 150000)
             {
-
                 LivoxExtendRawPoint *p_point_data = (LivoxExtendRawPoint *)data->data;
                 renderWindow::vertexPositions[livoxreceiver::bufferVertexCount][0] = GLfloat(p_point_data->x) / 1000;
                 renderWindow::vertexPositions[livoxreceiver::bufferVertexCount][1] = GLfloat(p_point_data->y )/ 1000;
@@ -161,6 +160,8 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
                     }
                 }
                 else{
+
+
 //                    renderWindow::vertexReflectivity[livoxreicever::bufferVertexCount][0] =
 //                            GLfloat(p_point_data->reflectivity) / 255;
 //                    renderWindow::vertexReflectivity[livoxreceiver::bufferVertexCount][1] =
@@ -181,6 +182,7 @@ void livoxreceiver::GetLidarData(uint8_t handle, LivoxEthPacket *data, uint32_t 
             }
             else
             {
+                qDebug() << "in";
                 qDebug() << "Current Thread ID in getLidarcallback:" << QThread::currentThreadId();
 //                MainWindow::replaceThisPointer->renderRgbPCWidget->update();
                 livoxreceiver::bufferVertexCount = 0;

@@ -1,5 +1,5 @@
 ﻿#include "mainwindow.h"
-//#include "frontendinfo.h"
+#include "frontendinfo.h"
 
 void setLidarThreadObject::setLidarSLOT()
 {
@@ -43,7 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     // test
     frontEndInfo::calculateRotateTranslateVector();
 
-
+    set_calib();
     this->setAttribute(Qt::WA_DeleteOnClose);
     centralWidget = new QWidget(this);
     centralHLayout = new QHBoxLayout(centralWidget);
