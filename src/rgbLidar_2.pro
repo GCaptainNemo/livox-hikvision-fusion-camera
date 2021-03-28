@@ -4,7 +4,6 @@ QT       += opengl
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 CONFIG += c++11
-
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Please consult the documentation of the
@@ -38,12 +37,50 @@ HEADERS += \
     renderwindow.h \
     roamingscenemanager.h
 
-# 在LapTop和PC上不同的路径在后，相同的在前
+# 控制LapTop和PC的宏
+DEFINES += LAB_COMPUTER
+if(contains(DEFINES, LAB_COMPUTER)){
 INCLUDEPATH += D:/glew/glew-2.1.0/include\
                C:/opencv/opencv/build/include\
                C:/opencv/opencv/build/include/opencv2\
                D:/glm/glm\
-# ######################
+               C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt\
+               C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
+               D:/pg_cpp/livox_sdk/Livox-SDK/sdk_core/include\
+               D:/pg_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
+               D:/pg_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/spdlog\
+               D:/pg_cpp/livox_sdk/Livox-SDK/third_party/apr/include\
+               D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
+LIBS += kernel32.lib\
+        user32.lib\
+        gdi32.lib\
+        winspool.lib\
+        shell32.lib\
+        ole32.lib\
+        oleaut32.lib\
+        uuid.lib\
+        comdlg32.lib\
+        advapi32.lib\
+        OpenGL32.Lib\
+        GlU32.Lib\
+        glut32.lib\
+        D:/glew/glew-2.1.0/lib/Release/Win32/glew32s.lib\
+        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450.lib\
+        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450d.lib\
+        C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
+        D:/pg_cpp/livox_sdk/Livox-SDK/third_party/apr/lib/libapr-1.lib\
+        D:/pg_cpp/livox_sdk/Livox-SDK/temp64/sdk_core/Debug/livox_sdk_static.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCAlarm.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCGeneralCfgMgr.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCPreview.lib\
+        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib\
+}else{
+INCLUDEPATH += D:/glew/glew-2.1.0/include\
+               C:/opencv/opencv/build/include\
+               C:/opencv/opencv/build/include/opencv2\
+               D:/glm/glm\
                C:/Program Files (x86)/Windows Kits/10/Include/10.0.16299.0/ucrt\
                C:/Program Files (x86)/Windows Kits/10/Lib/10.0.16299.0/um/x64\
                D:/livox_hikvision_huawei/livox/Livox-SDK/sdk_core/include\
@@ -51,17 +88,6 @@ INCLUDEPATH += D:/glew/glew-2.1.0/include\
                D:/livox_hikvision_huawei/livox/Livox-SDK/sdk_core/include/third_party/spdlog\
                D:/livox_hikvision_huawei/livox/Livox-SDK/third_party/apr/include\
                D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
-#               C:/Program Files (x86)/Windows Kits/10/Include/10.0.17763.0/ucrt\
-#               C:/Program Files (x86)/Windows Kits/10/Lib/10.0.17763.0/um/x64\
-#               D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include\
-#               D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/FastCRC\
-#               D:/program_cpp/livox_sdk/Livox-SDK/sdk_core/include/third_party/spdlog\
-#               D:/program_cpp/livox_sdk/Livox-SDK/third_party/apr/include\
-#               D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/include\
-
-
-
-
 LIBS += kernel32.lib\
         user32.lib\
         gdi32.lib\
@@ -86,10 +112,37 @@ LIBS += kernel32.lib\
         D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCGeneralCfgMgr.lib\
         D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCPreview.lib\
         D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib\
+}
 
+
+
+#LIBS += kernel32.lib\
+#        user32.lib\
+#        gdi32.lib\
+#        winspool.lib\
+#        shell32.lib\
+#        ole32.lib\
+#        oleaut32.lib\
+#        uuid.lib\
+#        comdlg32.lib\
+#        advapi32.lib\
+#        OpenGL32.Lib\
+#        GlU32.Lib\
+#        glut32.lib\
+#        D:/glew/glew-2.1.0/lib/Release/Win32/glew32s.lib\
+#        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450.lib\
+#        C:/opencv/opencv/build/x64/vc15/lib/opencv_world450d.lib\
+##        D:/livox_hikvision_huawei/livox/Livox-SDK/third_party/apr/lib/libapr-1.lib\
+##        D:/livox_hikvision_huawei/livox/Livox-SDK/build/sdk_core/Debug/livox_sdk_static.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCAlarm.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCGeneralCfgMgr.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCPreview.lib\
+##        D:/livox_hikvision_huawei/hikvision/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/PlayCtrl.lib\
 #        C:/Qt/Qt5.13.1/5.13.1/msvc2017_64/lib/freeglut.lib\
-#        D:/program_cpp/livox_sdk/Livox-SDK/temp64/sdk_core/Debug/livox_sdk_static.lib\
 #        D:/program_cpp/livox_sdk/Livox-SDK/third_party/apr/lib/libapr-1.lib\
+#        D:/program_cpp/livox_sdk/Livox-SDK/temp64/sdk_core/Debug/livox_sdk_static.lib\
 #        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCCore.lib\
 #        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDK.lib\
 #        D:/LIVOX_HIKVISION/Hikvision/sdk/CH-HCNetSDKV6.1.4.42_build20200527_win64/lib/HCNetSDKCom/HCAlarm.lib\
