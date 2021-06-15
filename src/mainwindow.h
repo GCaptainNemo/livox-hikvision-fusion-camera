@@ -14,7 +14,8 @@
 #include <vector>
 #include <QString>
 #include <QDebug>
-
+//#include <pcl/visualization/pcl_visualizer.h>
+#include <pcl/io/io.h>
 #include "renderwindow.h"
 #include "livox_sdk.h"
 #include "receiverhikvision.h"
